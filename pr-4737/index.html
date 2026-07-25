@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test Plan — PR #4737</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;
+  --surface:#ffffff;
+  --surface-2:#f8f9fb;
+  --surface-3:#f3f4f6;
+  --border:#e5e7eb;
+  --border-2:#d1d5db;
+  --text:#111827;
+  --text-2:#374151;
+  --text-3:#6b7280;
+  --text-4:#9ca3af;
+  --accent:#2563eb;
+  --accent-bg:#eff6ff;
+  --accent-border:#bfdbfe;
+  --pass:#059669;--pass-bg:#f0fdf4;--pass-border:#a7f3d0;
+  --fail:#dc2626;--fail-bg:#fef2f2;--fail-border:#fecaca;
+  --notrun-bg:#f9fafb;--notrun-border:#e5e7eb;--notrun:#6b7280;
+  --mono:'SF Mono','Fira Code',Consolas,'Courier New',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --r:8px;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+}
+html{font-size:14px;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.65;min-height:100vh}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:11px 32px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.header-logo{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
+.main{padding:24px 32px;display:flex;flex-direction:column;gap:20px}
+.pr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 24px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.pr-number-row{display:flex;align-items:center;gap:10px}
+.pr-badge{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);padding:3px 11px;border-radius:20px;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
+.pr-title-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pr-title{font-size:20px;font-weight:700;color:var(--text);line-height:1.3}
+.pr-link{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:7px;padding:8px 18px;white-space:nowrap;transition:opacity .15s}
+.pr-link:hover{opacity:.8}
+.pr-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.pr-meta-item{display:flex;align-items:center;gap:5px}
+.pr-meta-label{font-weight:600;color:var(--text-4);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.pr-meta-val{font-family:var(--mono);font-size:12.5px;color:var(--text-2)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.stat-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px}
+.stat-num{font-size:32px;font-weight:700;font-family:var(--mono);line-height:1;font-variant-numeric:tabular-nums}
+.n-total{color:var(--text)}.n-notrun{color:var(--notrun)}.n-pass{color:var(--pass)}.n-fail{color:var(--fail)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+.card-head{padding:13px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface-2)}
+.card-head-title{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3)}
+.card-hint{margin-left:auto;font-size:12px;color:var(--text-4);font-style:italic}
+.impact-block{padding:0 20px 8px}
+.impact-label{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3);padding:14px 0 10px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.impact-row{display:grid;grid-template-columns:220px 140px 1fr;gap:16px;padding:13px 0;border-bottom:1px solid var(--border);align-items:start}
+.impact-row:last-child{border-bottom:none}
+.im-module{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:600}
+.im-range{display:inline-block;font-family:var(--mono);font-size:12px;color:var(--text-3);background:var(--surface-3);border:1px solid var(--border-2);padding:3px 9px;border-radius:4px}
+.im-reason{font-size:13.5px;color:var(--text-2);line-height:1.65}
+.new-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:baseline}
+.new-row:last-child{border-bottom:none}
+.new-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:8px}
+.new-text{font-size:13.5px;color:var(--text-2);line-height:1.65}
+.new-module{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:700}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+col.c-id{width:62px}col.c-surf{width:160px}col.c-pre{width:14%}col.c-step{width:18%}col.c-exp{width:18%}col.c-data{width:14%}col.c-stat{width:90px}
+th{padding:11px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);background:var(--surface-2);border-bottom:2px solid var(--border);white-space:nowrap}
+th.c-stat-h{text-align:center}
+td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text-2);vertical-align:top;line-height:1.65;word-break:break-word;overflow-wrap:anywhere}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface-2)}
+.t-id{font-family:var(--mono);font-size:11px;color:var(--text-3);white-space:nowrap}
+.t-mod{font-family:var(--mono);font-size:12px;color:var(--accent);display:block;margin-bottom:5px;font-weight:700}
+.t-surface{font-size:14px;font-weight:600;color:var(--text)}
+.steps ol{padding-left:16px;display:flex;flex-direction:column;gap:4px}
+.steps li{color:var(--text-2)}
+.status-cell{text-align:center;vertical-align:middle}
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:5px 12px;border-radius:20px;cursor:pointer;user-select:none;border:1px solid;transition:opacity .1s,transform .08s;white-space:nowrap}
+.chip:hover{opacity:.8}.chip:active{transform:scale(.95)}
+.chip[data-s="notrun"]{background:var(--notrun-bg);color:var(--notrun);border-color:var(--notrun-border)}
+.chip[data-s="pass"]{background:var(--pass-bg);color:var(--pass);border-color:var(--pass-border)}
+.chip[data-s="fail"]{background:var(--fail-bg);color:var(--fail);border-color:var(--fail-border)}
+.chip::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.footer{padding:12px 20px;border-top:1px solid var(--border);background:var(--surface-2);display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);color:var(--text-4)}
+</style>
+</head>
+<body>
+<div class="header">
+  <span class="header-logo">🧪 QE Test Plan</span>
+</div>
+<div class="main">
+  <div class="pr-card">
+    <div class="pr-number-row">
+      <span class="pr-badge">PR #4737</span>
+    </div>
+    <div class="pr-title-row">
+      <div class="pr-title">Mid year report changes with upgraded angular version</div>
+      <a class="pr-link" href="https://github.com/cialfo/app-cialfo-core-web/pull/4737" target="_blank">↗ View on GitHub</a>
+    </div>
+    <div class="pr-meta">
+      <div class="pr-meta-item"><span class="pr-meta-label">Branch</span><span class="pr-meta-val">myr_changes</span></div>
+      <div class="pr-meta-item"><span class="pr-meta-label">Date</span><span class="pr-meta-val">2026-07-25</span></div>
+      <div class="pr-meta-item"><span class="pr-meta-label">Repo</span><span class="pr-meta-val">cialfo/app-cialfo-core-web</span></div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Total</div><div class="stat-num n-total">13</div></div>
+    <div class="stat"><div class="stat-label">Not Run</div><div class="stat-num n-notrun" id="c-notrun">13</div></div>
+    <div class="stat"><div class="stat-label">Pass</div><div class="stat-num n-pass" id="c-pass">0</div></div>
+    <div class="stat"><div class="stat-label">Fail</div><div class="stat-num n-fail" id="c-fail">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-head-title">Impact</span></div>
+    
+    <div class="impact-block">
+      <div class="impact-label">Regression</div>
+      
+        <div class="impact-row">
+          <span class="im-module">CDocs — Documents</span>
+          <span class="im-range">TC-CDOC — Prepare Form (all CA forms)</span>
+          <span class="im-reason">Prepare Form (Common App forms) reuses the shared cdocs-form-summary sub-component; the changed upload/eval-change gating logic runs for every CA form that includes this summary section, not just Mid Year Report — Prepare/edit-mode pre-fill and submission flows should be regression-checked.</span>
+        </div>
+        <div class="impact-row">
+          <span class="im-module">CDocs — Delivery Integrations</span>
+          <span class="im-range">TC-CDEL — Common App section / Send all</span>
+          <span class="im-reason">Send All&#x27;s Final Year Report enrolment-confirmation modal and per-form completeness checks depend on the summary sub-component&#x27;s required-field state; the new Q3001/Q3002 required-field logic on Mid Year could change whether a Mid Year form is considered complete/sendable.</span>
+        </div>
+        <div class="impact-row">
+          <span class="im-module">Discovery &amp; Research — University Profile</span>
+          <span class="im-range">N/A — no existing TC covers date-picker bounds</span>
+          <span class="im-reason">FORM_MIN_DATE/FORM_MAX_DATE and the School Profile grad-date bounds are shared date-picker constants; widening them from 1955–2030 to 1956–2031 affects every date field that imports these constants across the Common App forms family, not just Mid Year.</span>
+        </div>
+    </div>
+    
+    <div class="impact-block">
+      <div class="impact-label">New Surfaces</div>
+      
+        <div class="new-row">
+          <div class="new-dot"></div>
+          <div class="new-text"><span class="new-module">CDocs — Documents (Common App Forms — Mid Year Report)</span> — Two new questions on the Mid Year Report&#x27;s summary section, shown only when &quot;Do you want to provide an updated evaluation for this applicant?&quot; = Yes: Q3001 a checkbox group (&quot;Upload a document&quot; / &quot;Write a response&quot;, multi-select) and Q3002 a conditional free-text response (1–250 words, required only when &quot;Write a response&quot; is checked). Selecting &quot;Upload a document&quot; continues to show the existing file-upload control; selecting neither leaves both hidden. No prior TC module exists for the cdocs-common-app-forms feature area (Mid Year Report, School Report, Optional Report, Optional Report 2, Final Report, Counselor Profile, Early Decision Agreement forms) — this PR is the first change QE has evaluated in it.</div>
+        </div>
+        <div class="new-row">
+          <div class="new-dot"></div>
+          <div class="new-text"><span class="new-module">CDocs — Documents (Common App Forms — date-picker bounds)</span> — Class-rank / GPA date question bounds widened by one year on both ends (min 1955→1956, max 2030→2031) across Counselor Profile, School Report, MidYear Report, Optional Report, Optional Report 2, and Final Report. Separately, other date questions (Counselor Profile Q1969, Early Decision Agreement Q1501/Q1732) had their bounds increased to 2026–2027 per the PR description, though no corresponding source change for those specific questions appears in this diff — see flag below.</div>
+        </div>
+        <div class="new-row">
+          <div class="new-dot"></div>
+          <div class="new-text"><span class="new-module">CDocs — Documents (School Information — Mid Year Report date window)</span> — The School Information Mid Year Report section&#x27;s date-range validator (`withinCurrentYearValidator` → renamed `withinAllowedDateRangeValidator`) changed from a single-cycle rolling window (Aug cutoff, current/current+1 year) to a fixed 13-year window: currentYear−10 to currentYear+2. A next-cycle mid-year date (year+1) that the old validator wrongly rejected now passes.</div>
+        </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <span class="card-head-title">Test Plan</span>
+      <span class="card-hint">Click a status chip to cycle: NOT RUN → PASS → FAIL</span>
+    </div>
+    <div class="scroll">
+      <table>
+        <colgroup>
+          <col class="c-id"><col class="c-surf"><col class="c-pre">
+          <col class="c-step"><col class="c-exp"><col class="c-data"><col class="c-stat">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Surface</th>
+            <th>Preconditions</th>
+            <th>Steps</th>
+            <th>Expected Result</th>
+            <th>Data Requirements</th>
+            <th class="c-stat-h">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td class="t-id">TP-001</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">Mid Year Report — Q3001 change-explanation choice visibility</span></td>
+          <td>Logged in as a Counselor/Admin with cDocs access; a student with a Mid Year Report form available to prepare (recommender or counselor-prepare flow).</td>
+          <td><div class="steps"><ol><li>Open the Mid Year Report form&#x27;s summary section.</li><li>Leave &quot;Do you wish to update your original evaluation of this applicant?&quot; unanswered, then set it to No.</li><li>Observe the choice checkbox group is hidden in both states.</li><li>Set the evaluation-change question to Yes.</li></ol></div></td>
+          <td>The &quot;How would you like to add your changes or updates?&quot; checkbox group (Upload a document / Write a response) is hidden while the evaluation-change answer is unset or No, and appears — marked required — as soon as it is set to Yes.</td>
+          <td>Existing Mid Year Report prepare flow; no new factory data required beyond a student with an assignable Mid Year Report.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-002</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">Mid Year Report — Q3001 required validation</span></td>
+          <td>Mid Year Report summary section open, evaluation-change = Yes.</td>
+          <td><div class="steps"><ol><li>With evaluation-change = Yes and neither checkbox ticked, attempt to submit/save the form.</li><li>Tick &quot;Upload a document&quot;.</li><li>Attempt to submit again.</li></ol></div></td>
+          <td>Submission is blocked with a required-field indication while neither Q3001 option is selected; ticking either option clears the required error on the choice control.</td>
+          <td>None beyond TP-001 preconditions.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-003</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">Mid Year Report — Upload shown/hidden by Q3001 choice</span></td>
+          <td>Mid Year Report summary section open, evaluation-change = Yes.</td>
+          <td><div class="steps"><ol><li>Tick &quot;Upload a document&quot; only.</li><li>Verify the existing file-upload control appears and is required.</li><li>Untick &quot;Upload a document&quot; (leave both unticked).</li><li>Verify the upload control disappears and any selected file/attachment is cleared.</li></ol></div></td>
+          <td>The upload control shows only while &quot;Upload a document&quot; is checked (or course_change = Yes, independent of Q3001); unchecking it hides the control and clears the previously attached file so a stale file id is never submitted.</td>
+          <td>A test PDF file within the 2000 KB limit for the upload step.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-004</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">Mid Year Report — Q3002 free-response shown by Q3001 choice</span></td>
+          <td>Mid Year Report summary section open, evaluation-change = Yes.</td>
+          <td><div class="steps"><ol><li>Tick &quot;Write a response&quot; only.</li><li>Verify the &quot;Describe the changes or updates&quot; textarea appears and is required.</li><li>Leave the textarea empty and attempt to submit.</li><li>Type a response between 1 and 250 words and submit.</li><li>Reopen the form, tick &quot;Write a response&quot; again, type more than 250 words.</li></ol></div></td>
+          <td>The textarea appears only when &quot;Write a response&quot; is checked; an empty or &gt;250-word response is rejected with the documented error message; a 1–250 word response is accepted and the form submits.</td>
+          <td>Two text samples: one within 1–250 words, one exceeding 250 words.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-005</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">Mid Year Report — Q3002 cleared when hidden</span></td>
+          <td>Mid Year Report summary section open, evaluation-change = Yes, &quot;Write a response&quot; ticked with drafted text entered.</td>
+          <td><div class="steps"><ol><li>Type a draft response into the Q3002 textarea.</li><li>Untick &quot;Write a response&quot; (leaving &quot;Upload a document&quot; unticked or ticked).</li><li>Verify the textarea disappears.</li><li>Re-tick &quot;Write a response&quot;.</li></ol></div></td>
+          <td>Unticking &quot;Write a response&quot; clears the previously typed text so stale content is not submitted; re-ticking shows an empty textarea, not the previously drafted text.</td>
+          <td>None beyond TP-004 preconditions.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-006</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">Mid Year Report — both choices selected simultaneously</span></td>
+          <td>Mid Year Report summary section open, evaluation-change = Yes.</td>
+          <td><div class="steps"><ol><li>Tick both &quot;Upload a document&quot; and &quot;Write a response&quot;.</li><li>Verify both the upload control and the Q3002 textarea appear together.</li><li>Attach a file and enter a valid response.</li><li>Submit the form.</li></ol></div></td>
+          <td>Both sub-fields can be shown and satisfied simultaneously; the form submits successfully with both a file attachment and a written response recorded.</td>
+          <td>A test PDF and a 1–250-word text sample.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-007</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">Mid Year Report — reset when evaluation-change flips back to No</span></td>
+          <td>Mid Year Report summary section open, evaluation-change = Yes, one or both Q3001 choices ticked and Q3002 text entered.</td>
+          <td><div class="steps"><ol><li>With evaluation-change = Yes, tick &quot;Write a response&quot; and enter text.</li><li>Change evaluation-change back to No.</li><li>Verify the choice checkboxes, upload control, and textarea all hide/clear.</li><li>Change evaluation-change back to Yes.</li></ol></div></td>
+          <td>Flipping evaluation-change to No clears the Q3001 selections, drops any cached upload attachment, and clears the Q3002 text; flipping back to Yes shows Q3001 unchecked, not the previous selections.</td>
+          <td>None beyond TP-004 preconditions.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-008</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">Mid Year Report — edit mode hydrates a previously saved Q3001/Q3002 answer</span></td>
+          <td>A Mid Year Report previously submitted with Q3001 = [&quot;Upload a document&quot;, &quot;Write a response&quot;] and a saved Q3002 response.</td>
+          <td><div class="steps"><ol><li>Open the previously submitted Mid Year Report in edit mode.</li><li>Observe the Q3001 checkboxes and Q3002 textarea state.</li></ol></div></td>
+          <td>Both previously-selected Q3001 checkboxes render checked and the Q3002 textarea is pre-filled with the saved response — the saved JSON-string answer is correctly parsed back into an array/text on load (BE stores `mr_change_explanation_choice` as a JSON string per the serialize/normalize contract in this PR).</td>
+          <td>A Mid Year Report record with a previously submitted answer for Q3001 (JSON string of one or more choice values) and Q3002.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-009</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">Mid Year Report — class rank / GPA date bounds widened</span></td>
+          <td>Mid Year Report (or School Report / Optional Report / Optional Report 2 / Final Report / Counselor Profile) class rank or GPA date-range field open.</td>
+          <td><div class="steps"><ol><li>Open a class rank or GPA date field on the Mid Year Report.</li><li>Attempt to pick or type 1955-12-31 (previously the min-bound year).</li><li>Attempt to pick or type 1956-01-01.</li><li>Attempt to pick or type 2031-12-31.</li><li>Attempt to pick or type 2032-01-01.</li></ol></div></td>
+          <td>1955-12-31 is now out of range and rejected/disabled; 1956-01-01 through 2031-12-31 is accepted; 2032-01-01 is rejected — confirming the widened FORM_MIN_DATE (1956-01-01) / FORM_MAX_DATE (2031-12-31) bounds took effect for this shared date-picker constant.</td>
+          <td>None — date entry only.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-010</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">School Profile — graduation date bounds widened</span></td>
+          <td>Counselor/Admin on the School Profile section (school-information-school-profile-section) with a graduation-date field.</td>
+          <td><div class="steps"><ol><li>Open the School Profile graduation date field.</li><li>Attempt 1955-12-31 (previously valid as the min bound minus one day boundary).</li><li>Attempt 1956-01-01.</li><li>Attempt 2031-06-01 (previously out of range under the old 2030 max).</li></ol></div></td>
+          <td>1955-12-31 is disabled/out-of-range; 1956-01-01 is the new minimum and is selectable; 2031-06-01 is now selectable under the new 2031 max, where it was previously disabled.</td>
+          <td>None — date entry only.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-011</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">School Information — Mid Year Report date window widened (single-cycle → 13-year window)</span></td>
+          <td>Counselor/Admin on the School Information Mid Year Report configuration section, in a school year cycle before August (so the old validator&#x27;s Aug-cutoff behavior is distinguishable).</td>
+          <td><div class="steps"><ol><li>Open the Mid Year Report date configuration field.</li><li>Enter a date in the current calendar year.</li><li>Enter a date exactly one year ahead (next cycle) — e.g. currentYear+1, February.</li><li>Enter a date 3 years ahead.</li><li>Enter a date 11 years in the past.</li></ol></div></td>
+          <td>Current-year date passes (as before); the next-cycle (year+1) date now passes where the old single-cycle validator incorrectly rejected it; a date 3 years ahead and a date 11 years in the past are both rejected as outside the currentYear−10 → currentYear+2 window.</td>
+          <td>None — date entry only; run this before/after the school&#x27;s August cutoff to confirm the old Aug-dependent behavior no longer applies.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-012</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">Mid Year Report summary — Q3001/Q3002 controls scoped to Mid Year only</span></td>
+          <td>Access to School Report, Optional Report, Optional Report 2, and Final Report forms that reuse the same cdocs-form-summary sub-component.</td>
+          <td><div class="steps"><ol><li>Open the summary section of the School Report form.</li><li>Open the summary section of the Final Report form.</li><li>Open the summary section of an Optional Report / Optional Report 2 form.</li><li>Confirm none of them show the Q3001 checkbox group or Q3002 textarea, regardless of the evaluation-change answer.</li></ol></div></td>
+          <td>Q3001/Q3002 are exclusive to the Mid Year Report (`prefix === &#x27;mr&#x27;`); School Report, Final Report, and Optional Report variants retain their pre-existing summary behavior (upload-only gating) with no new fields rendered.</td>
+          <td>Access to at least one prepare/edit flow for each of School Report, Final Report, and an Optional Report variant.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-013</td>
+          <td><span class="t-mod">CDocs — Documents</span><span class="t-surface">Mid Year Report — submission payload serialization for Q3001</span></td>
+          <td>Mid Year Report with Q3001 set to one or more choices, ready to submit.</td>
+          <td><div class="steps"><ol><li>Select both &quot;Upload a document&quot; and &quot;Write a response&quot; for Q3001, complete Q3002 and the upload, and submit the form.</li><li>Inspect the outgoing request payload (via browser network tools) for the `mr_change_explanation_choice` field.</li></ol></div></td>
+          <td>The submitted `mr_change_explanation_choice` value is sent as a JSON-stringified array (e.g. `[&quot;0&quot;,&quot;1&quot;]`), matching the BE&#x27;s `JSON.parse` contract described in the PR, not a raw array or comma-joined string.</td>
+          <td>Network inspection tooling; a completed Mid Year Report submission.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr></tbody>
+      </table>
+    </div>
+    <div class="footer">
+      <span>Formal TCs authored post-merge via docs-sync → TC maintenance</span>
+      <span>qe-automation · staging.cialfo.sg</span>
+    </div>
+  </div>
+</div>
+<script>
+const C=['notrun','pass','fail'],L={notrun:'NOT RUN',pass:'PASS',fail:'FAIL'};
+function cycle(el){
+  const n=C[(C.indexOf(el.dataset.s)+1)%3];
+  el.dataset.s=n;el.textContent=L[n];
+  const ch=[...document.querySelectorAll('.chip')];
+  document.getElementById('c-notrun').textContent=ch.filter(c=>c.dataset.s==='notrun').length;
+  document.getElementById('c-pass').textContent=ch.filter(c=>c.dataset.s==='pass').length;
+  document.getElementById('c-fail').textContent=ch.filter(c=>c.dataset.s==='fail').length;
+}
+</script>
+</body>
+</html>

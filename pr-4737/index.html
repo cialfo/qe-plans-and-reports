@@ -119,18 +119,13 @@ tr:hover td{background:var(--surface-2)}
       
         <div class="impact-row">
           <span class="im-module">CDocs — Documents</span>
-          <span class="im-range">TC-CDOC — Prepare Form (all CA forms)</span>
-          <span class="im-reason">Prepare Form (Common App forms) reuses the shared cdocs-form-summary sub-component; the changed upload/eval-change gating logic runs for every CA form that includes this summary section, not just Mid Year Report — Prepare/edit-mode pre-fill and submission flows should be regression-checked.</span>
+          <span class="im-range">TC-CDOC — Prepare Form (Final Year Report, Optional Report, Optional Report 2, Mid Year Report)</span>
+          <span class="im-reason">Prepare Form reuses the shared cdocs-form-summary sub-component; the changed upload/eval-change gating logic runs for every form that renders this summary section — confirmed to be Final Year Report, Optional Report, Optional Report 2, and Mid Year Report only (School Report and Counselor Recommendation forms do not include app-cdocs-form-summary) — Prepare/edit-mode pre-fill and submission flows should be regression-checked on those four forms.</span>
         </div>
         <div class="impact-row">
           <span class="im-module">CDocs — Delivery Integrations</span>
           <span class="im-range">TC-CDEL — Common App section / Send all</span>
           <span class="im-reason">Send All&#x27;s Final Year Report enrolment-confirmation modal and per-form completeness checks depend on the summary sub-component&#x27;s required-field state; the new Q3001/Q3002 required-field logic on Mid Year could change whether a Mid Year form is considered complete/sendable.</span>
-        </div>
-        <div class="impact-row">
-          <span class="im-module">Discovery &amp; Research — University Profile</span>
-          <span class="im-range">N/A — no existing TC covers date-picker bounds</span>
-          <span class="im-reason">FORM_MIN_DATE/FORM_MAX_DATE and the School Profile grad-date bounds are shared date-picker constants; widening them from 1955–2030 to 1956–2031 affects every date field that imports these constants across the Common App forms family, not just Mid Year.</span>
         </div>
     </div>
     

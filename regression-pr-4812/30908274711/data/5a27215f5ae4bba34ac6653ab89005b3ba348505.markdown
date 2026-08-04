@@ -1,0 +1,100 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: specs/guardian/linked-students.spec.ts >> GRDP — Linked Students >> TC-GRDP — Guardian opens a linked student's left-nav icon and sees the sub-nav panel
+- Location: tests/specs/guardian/linked-students.spec.ts:59:7
+
+# Error details
+
+```
+TimeoutError: locator.click: Timeout 60000ms exceeded.
+Call log:
+  - waiting for locator('aside.sidenav li').filter({ hasText: 'QE Student' })
+    - locator resolved to <li _ngcontent-ng-c746915661="" class="h-24 cursor-pointer flex flex-col items-center justify-center text-gray-650 hover:text-blue-700 hover:bg-blue-100 ng-star-inserted">…</li>
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img "Cialfo logo" [ref=e10]
+    - generic [ref=e11]:
+      - paragraph [ref=e12]: Your global education platform
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: The world is opening up for you.
+        - paragraph [ref=e15]: Where ambition meets opportunity.
+        - paragraph [ref=e16]: Students & counselors, one platform.
+        - paragraph [ref=e17]: Every journey starts here.
+  - generic [ref=e19]:
+    - generic [ref=e20]:
+      - generic [ref=e22]: QE Automation
+      - heading "Sign In" [level=1] [ref=e23]: Good afternoon
+      - paragraph [ref=e24]: Sign in to continue — students and counselors, all in one place.
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - generic [ref=e28]: C
+          - generic [ref=e29] [cursor=pointer]: Not you?
+        - generic [ref=e30]:
+          - generic [ref=e33]: Password
+          - generic [ref=e37]:
+            - textbox "Password" [ref=e38]
+            - img [ref=e41] [cursor=pointer]: 
+        - generic [ref=e43]:
+          - generic [ref=e44] [cursor=pointer]:
+            - checkbox "Remember me" [checked] [ref=e46]
+            - generic [ref=e48]: Remember me
+          - generic [ref=e49] [cursor=pointer]: Forgot Password?
+      - generic [ref=e50] [cursor=pointer]: Sign In
+      - generic [ref=e52]: or continue with
+      - generic [ref=e53]:
+        - generic [ref=e56] [cursor=pointer]:
+          - img "Google logo" [ref=e57]
+          - generic [ref=e58]: Google
+        - generic [ref=e61] [cursor=pointer]:
+          - img "Microsoft logo" [ref=e62]
+          - generic [ref=e63]: Microsoft
+        - generic [ref=e66] [cursor=pointer]:
+          - generic [ref=e67]: 
+          - generic [ref=e68]: Phone Number
+    - generic [ref=e69]:
+      - text: Students, if you do not have an account sign up here.
+      - generic [ref=e71] [cursor=pointer]: Student Signup
+```
+
+# Test source
+
+```ts
+  1  | import { Locator, Page } from '@playwright/test';
+  2  | 
+  3  | // Nav component — no URL, no goto(); attaches to every authenticated page as persistent chrome.
+  4  | // The left nav's per-student icons, shown only for a guardian, present on every authenticated page.
+  5  | export class GuardianLeftNav {
+  6  |   constructor(private readonly page: Page) {}
+  7  | 
+  8  |   // Locators
+  9  | 
+  10 |   // Finds the left-nav icon for a linked student by their first name.
+  11 |   // @param studentFirstName the student's first name, as shown under their icon
+  12 |   studentIcon(studentFirstName: string): Locator {
+  13 |     return this.page.locator('aside.sidenav li').filter({ hasText: studentFirstName });
+  14 |   }
+  15 | 
+  16 |   // Actions
+  17 | 
+  18 |   // Clicks a linked student's icon, opening their secondary nav panel.
+  19 |   // @param studentFirstName the student's first name, as shown under their icon
+  20 |   async openSubNavFor(studentFirstName: string) {
+> 21 |     await this.studentIcon(studentFirstName).click();
+     |                                              ^ TimeoutError: locator.click: Timeout 60000ms exceeded.
+  22 |   }
+  23 | }
+  24 | 
+```

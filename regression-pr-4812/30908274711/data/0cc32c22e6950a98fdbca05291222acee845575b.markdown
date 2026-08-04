@@ -1,0 +1,173 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: specs/apps/applications.spec.ts >> APPL — Application Tracker >> TC-APPL — Application actions kebab menu on a Common App application shows exactly its seven documented actions
+- Location: tests/specs/apps/applications.spec.ts:126:7
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: locator('[data-cy="action-item"]').first()
+Expected: visible
+Timeout: 60000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 60000ms
+  - waiting for locator('[data-cy="action-item"]').first()
+
+```
+
+```yaml
+- complementary:
+  - heading "QE Automation" [level=1]
+  - list:
+    - listitem:
+      - link "Home":
+        - /url: /app/6652/home
+        - img
+        - paragraph: Home
+    - listitem:
+      - link "Universities":
+        - /url: /app/students/6652/research_new
+        - img
+        - paragraph: Universities
+    - listitem:
+      - link "Bookmarks":
+        - /url: /app/students/6652/bookmarks
+        - img
+        - paragraph: Bookmarks
+    - listitem:
+      - link "Applications":
+        - /url: /app/students/6652/applications
+        - paragraph: Applications
+  - paragraph
+- banner:
+  - searchbox "Search for universities, content, careers and more.."
+  - navigation:
+    - img
+    - img
+    - img "User Avatar"
+- heading "Applications" [level=3]
+- text: Add application
+- heading "Apply to Australia? Use Direct Apply to get a fee waiver on your first application" [level=3]
+- heading "Apply to over 10,000 programs at 50+ leading Australian universities on Direct Apply and enjoy a one-time 100% fee waiver on your first application." [level=3]
+- heading "Submitted (1)" [level=3]
+- link "Recommendation Letters":
+  - /url: /app/students/6652/recommendations
+- link "Transcripts":
+  - /url: /app/students/6652/transcript-request
+- text: 0 In Progress 🇬🇧 UK DA Applications 0/5 More
+- img
+- text: Direct Apply 0
+- img
+- text: Common Application 0 More 1 Submitted Show Withdrawn
+- button "Show Withdrawn"
+- text: 🇬🇧 UK DA Applications 0/5 More
+- heading "Missed out on offers? UCAS Clearing is your next opportunity." [level=3]
+- heading "Clearing helps universities fill remaining course vacancies. Apply via Cialfo from July to October 2026 to manage your application progress." [level=3]
+- link "Search for Clearing courses on UCAS":
+  - /url: https://digital.ucas.com/coursedisplay/results/courses?studyYear=2024&destination=Undergraduate&vacancy=int&postcodeDistanceSystem=imperial&pageNumber=1&sort=MostRelevant&clearingPreference=None
+- text: Add application Request support from Cialfo
+- img
+- text: Direct Apply 0
+- img
+- text: Common Application 1 More
+- button:
+  - img
+- text: Harvard University
+- heading "Select course/major" [level=3]
+- paragraph: Result
+- text: Select
+- paragraph: Student decision
+- text: Select
+- paragraph: Enrollment
+- text: Select Your plans after high school
+- textbox
+- text: Select outcome
+- paragraph: Cialfo on desktop — faster than ever
+- text: Download for Windows Download for Mac
+- paragraph: You can always grab it later from your profile menu.
+```
+
+# Test source
+
+```ts
+  1  | import { expect, Locator, Page } from '@playwright/test';
+  2  | 
+  3  | const ACTION_LABEL: Record<string, string> = {
+  4  |   request_transcript: 'Request Transcript',
+  5  |   withdraw: 'Withdraw application',
+  6  |   un_withdraw: 'Unwithdraw',
+  7  |   mark_in_progress: 'Mark as in progress',
+  8  |   view_authorization_form: 'View authorization form',
+  9  |   change_portal: 'Change portal',
+  10 |   download_application_pdf: 'Download application PDF',
+  11 |   upload_documents: 'Upload supporting documents',
+  12 |   delete: 'Delete application',
+  13 |   update_personal_details: 'Update personal details',
+  14 |   request_help: 'Submit request for help',
+  15 |   change_program_choice: 'Change program choice',
+  16 | };
+  17 | 
+  18 | // One application row within a portal sub-section of the Application Tracker (In Progress or
+  19 | // Submitted). Its kebab menu (app-application-actions-list, via nz-tooltip) renders into a CDK
+  20 | // overlay outside the row, so menu-item locators are page-scoped — only the row's own menu is
+  21 | // open at a time.
+  22 | export class ApplicationRow {
+  23 |   private readonly row: Locator;
+  24 |   private readonly kebabButton: Locator;
+  25 |   private readonly menuItems: Locator;
+  26 | 
+  27 |   // @param kebabTestId data-cy of the kebab trigger; omit for rows with no data-cy (e.g. UCAS),
+  28 |   //   which fall back to their bare ellipsis-v icon
+  29 |   constructor(page: Page, portalSection: Locator, universityName: string, kebabTestId?: string) {
+  30 |     this.row = portalSection.filter({ hasText: universityName });
+  31 |     this.kebabButton = kebabTestId
+  32 |       ? this.row.locator(`[data-cy="${kebabTestId}"]`)
+  33 |       : this.row.locator('svg[data-icon="ellipsis-vertical"]').first();
+  34 |     this.menuItems = page.locator('[data-cy="action-item"]');
+  35 |   }
+  36 | 
+  37 |   // Actions
+  38 | 
+  39 |   // Opens this row's kebab menu.
+  40 |   async openKebabMenu() {
+  41 |     await this.kebabButton.click();
+> 42 |     await expect(this.menuItems.first()).toBeVisible();
+     |                                          ^ Error: expect(locator).toBeVisible() failed
+  43 |   }
+  44 | 
+  45 |   // Selects an action from the open kebab menu.
+  46 |   // @param action the action key as shown on the row's kebab menu (e.g. 'delete', 'withdraw')
+  47 |   async selectAction(action: keyof typeof ACTION_LABEL) {
+  48 |     await this.menuItems.filter({ hasText: ACTION_LABEL[action] }).click();
+  49 |   }
+  50 | 
+  51 |   // Assertions
+  52 | 
+  53 |   // Asserts this row is visible in its portal section.
+  54 |   async expectVisible() {
+  55 |     await expect(this.row).toBeVisible();
+  56 |   }
+  57 | 
+  58 |   // Asserts this row is no longer present in its portal section.
+  59 |   async expectNotVisible() {
+  60 |     await expect(this.row).toHaveCount(0);
+  61 |   }
+  62 | 
+  63 |   // Asserts the open kebab menu shows exactly the given actions, in order.
+  64 |   // @param actions the expected action keys, in menu order
+  65 |   async expectMenuActions(actions: (keyof typeof ACTION_LABEL)[]) {
+  66 |     await expect(this.menuItems).toHaveText(actions.map(a => new RegExp(ACTION_LABEL[a])));
+  67 |   }
+  68 | }
+  69 | 
+```

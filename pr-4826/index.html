@@ -127,11 +127,6 @@ tr:hover td{background:var(--surface-2)}
           <span class="im-range">TC-DA — UCAS personal statement TCs (2)</span>
           <span class="im-reason">direct-apply-iframe.component.ts now explicitly passes { surface: &#x27;drawer&#x27; } to openSaige() for the personal-statement review, preserving drawer behaviour by design, but the call signature changed (2nd arg type changed from an inline object to SaigeHook, 3rd arg added) — worth a regression pass to confirm the review still opens over the form rather than navigating away from it.</span>
         </div>
-        <div class="impact-row">
-          <span class="im-module">Discovery &amp; Research — Scholarships</span>
-          <span class="im-range">Any TC that opens Saige via a scholarships CTA</span>
-          <span class="im-reason">Same openSaige() default-surface change as the student dashboard — any entry point calling openAiService.openSaige() without an explicit surface now lands on the dedicated screen, not the drawer.</span>
-        </div>
     </div>
     
     <div class="impact-block">

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test Plan — PR #4812</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;
+  --surface:#ffffff;
+  --surface-2:#f8f9fb;
+  --surface-3:#f3f4f6;
+  --border:#e5e7eb;
+  --border-2:#d1d5db;
+  --text:#111827;
+  --text-2:#374151;
+  --text-3:#6b7280;
+  --text-4:#9ca3af;
+  --accent:#2563eb;
+  --accent-bg:#eff6ff;
+  --accent-border:#bfdbfe;
+  --pass:#059669;--pass-bg:#f0fdf4;--pass-border:#a7f3d0;
+  --fail:#dc2626;--fail-bg:#fef2f2;--fail-border:#fecaca;
+  --notrun-bg:#f9fafb;--notrun-border:#e5e7eb;--notrun:#6b7280;
+  --mono:'SF Mono','Fira Code',Consolas,'Courier New',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --r:8px;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+}
+html{font-size:14px;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.65;min-height:100vh}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:11px 32px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.header-logo{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
+.main{padding:24px 32px;display:flex;flex-direction:column;gap:20px}
+.pr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 24px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.pr-number-row{display:flex;align-items:center;gap:10px}
+.pr-badge{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);padding:3px 11px;border-radius:20px;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
+.pr-title-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pr-title{font-size:20px;font-weight:700;color:var(--text);line-height:1.3}
+.pr-link{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:7px;padding:8px 18px;white-space:nowrap;transition:opacity .15s}
+.pr-link:hover{opacity:.8}
+.pr-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.pr-meta-item{display:flex;align-items:center;gap:5px}
+.pr-meta-label{font-weight:600;color:var(--text-4);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.pr-meta-val{font-family:var(--mono);font-size:12.5px;color:var(--text-2)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.stat-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px}
+.stat-num{font-size:32px;font-weight:700;font-family:var(--mono);line-height:1;font-variant-numeric:tabular-nums}
+.n-total{color:var(--text)}.n-notrun{color:var(--notrun)}.n-pass{color:var(--pass)}.n-fail{color:var(--fail)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+.card-head{padding:13px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface-2)}
+.card-head-title{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3)}
+.card-hint{margin-left:auto;font-size:12px;color:var(--text-4);font-style:italic}
+.impact-block{padding:0 20px 8px}
+.impact-label{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3);padding:14px 0 10px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.impact-row{display:grid;grid-template-columns:220px 140px 1fr;gap:16px;padding:13px 0;border-bottom:1px solid var(--border);align-items:start}
+.impact-row:last-child{border-bottom:none}
+.im-module{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:600}
+.im-range{display:inline-block;font-family:var(--mono);font-size:12px;color:var(--text-3);background:var(--surface-3);border:1px solid var(--border-2);padding:3px 9px;border-radius:4px}
+.im-reason{font-size:13.5px;color:var(--text-2);line-height:1.65}
+.new-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:baseline}
+.new-row:last-child{border-bottom:none}
+.new-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:8px}
+.new-text{font-size:13.5px;color:var(--text-2);line-height:1.65}
+.new-module{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:700}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+col.c-id{width:62px}col.c-surf{width:160px}col.c-pre{width:14%}col.c-step{width:18%}col.c-exp{width:18%}col.c-data{width:14%}col.c-stat{width:90px}
+th{padding:11px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);background:var(--surface-2);border-bottom:2px solid var(--border);white-space:nowrap}
+th.c-stat-h{text-align:center}
+td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text-2);vertical-align:top;line-height:1.65;word-break:break-word;overflow-wrap:anywhere}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface-2)}
+.t-id{font-family:var(--mono);font-size:11px;color:var(--text-3);white-space:nowrap}
+.t-mod{font-family:var(--mono);font-size:12px;color:var(--accent);display:block;margin-bottom:5px;font-weight:700}
+.t-surface{font-size:14px;font-weight:600;color:var(--text)}
+.steps ol{padding-left:16px;display:flex;flex-direction:column;gap:4px}
+.steps li{color:var(--text-2)}
+.status-cell{text-align:center;vertical-align:middle}
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:5px 12px;border-radius:20px;cursor:pointer;user-select:none;border:1px solid;transition:opacity .1s,transform .08s;white-space:nowrap}
+.chip:hover{opacity:.8}.chip:active{transform:scale(.95)}
+.chip[data-s="notrun"]{background:var(--notrun-bg);color:var(--notrun);border-color:var(--notrun-border)}
+.chip[data-s="pass"]{background:var(--pass-bg);color:var(--pass);border-color:var(--pass-border)}
+.chip[data-s="fail"]{background:var(--fail-bg);color:var(--fail);border-color:var(--fail-border)}
+.chip::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.footer{padding:12px 20px;border-top:1px solid var(--border);background:var(--surface-2);display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);color:var(--text-4)}
+</style>
+</head>
+<body>
+<div class="header">
+  <span class="header-logo">🧪 QE Test Plan</span>
+</div>
+<div class="main">
+  <div class="pr-card">
+    <div class="pr-number-row">
+      <span class="pr-badge">PR #4812</span>
+    </div>
+    <div class="pr-title-row">
+      <div class="pr-title">docs: paperclip auto-sync — 2026-08-04</div>
+      <a class="pr-link" href="https://github.com/cialfo/app-cialfo-core-web/pull/4812" target="_blank">↗ View on GitHub</a>
+    </div>
+    <div class="pr-meta">
+      <div class="pr-meta-item"><span class="pr-meta-label">Branch</span><span class="pr-meta-val">docs/paperclip-sync-2026-08-04</span></div>
+      <div class="pr-meta-item"><span class="pr-meta-label">Date</span><span class="pr-meta-val">2026-08-05</span></div>
+      <div class="pr-meta-item"><span class="pr-meta-label">Repo</span><span class="pr-meta-val">cialfo/app-cialfo-core-web</span></div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Total</div><div class="stat-num n-total">0</div></div>
+    <div class="stat"><div class="stat-label">Not Run</div><div class="stat-num n-notrun" id="c-notrun">0</div></div>
+    <div class="stat"><div class="stat-label">Pass</div><div class="stat-num n-pass" id="c-pass">0</div></div>
+    <div class="stat"><div class="stat-label">Fail</div><div class="stat-num n-fail" id="c-fail">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-head-title">Impact</span></div>
+    
+    
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <span class="card-head-title">Test Plan</span>
+      <span class="card-hint">Click a status chip to cycle: NOT RUN → PASS → FAIL</span>
+    </div>
+    <div class="scroll">
+      <table>
+        <colgroup>
+          <col class="c-id"><col class="c-surf"><col class="c-pre">
+          <col class="c-step"><col class="c-exp"><col class="c-data"><col class="c-stat">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Surface</th>
+            <th>Preconditions</th>
+            <th>Steps</th>
+            <th>Expected Result</th>
+            <th>Data Requirements</th>
+            <th class="c-stat-h">Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="footer">
+      <span>Formal TCs authored post-merge via docs-sync → TC maintenance</span>
+      <span>qe-automation · staging.cialfo.sg</span>
+    </div>
+  </div>
+</div>
+<script>
+const C=['notrun','pass','fail'],L={notrun:'NOT RUN',pass:'PASS',fail:'FAIL'};
+function cycle(el){
+  const n=C[(C.indexOf(el.dataset.s)+1)%3];
+  el.dataset.s=n;el.textContent=L[n];
+  const ch=[...document.querySelectorAll('.chip')];
+  document.getElementById('c-notrun').textContent=ch.filter(c=>c.dataset.s==='notrun').length;
+  document.getElementById('c-pass').textContent=ch.filter(c=>c.dataset.s==='pass').length;
+  document.getElementById('c-fail').textContent=ch.filter(c=>c.dataset.s==='fail').length;
+}
+</script>
+</body>
+</html>

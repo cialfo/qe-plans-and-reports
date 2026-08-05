@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test Plan — PR #4826</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;
+  --surface:#ffffff;
+  --surface-2:#f8f9fb;
+  --surface-3:#f3f4f6;
+  --border:#e5e7eb;
+  --border-2:#d1d5db;
+  --text:#111827;
+  --text-2:#374151;
+  --text-3:#6b7280;
+  --text-4:#9ca3af;
+  --accent:#2563eb;
+  --accent-bg:#eff6ff;
+  --accent-border:#bfdbfe;
+  --pass:#059669;--pass-bg:#f0fdf4;--pass-border:#a7f3d0;
+  --fail:#dc2626;--fail-bg:#fef2f2;--fail-border:#fecaca;
+  --notrun-bg:#f9fafb;--notrun-border:#e5e7eb;--notrun:#6b7280;
+  --mono:'SF Mono','Fira Code',Consolas,'Courier New',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --r:8px;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+}
+html{font-size:14px;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.65;min-height:100vh}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:11px 32px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.header-logo{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
+.main{padding:24px 32px;display:flex;flex-direction:column;gap:20px}
+.pr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 24px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.pr-number-row{display:flex;align-items:center;gap:10px}
+.pr-badge{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);padding:3px 11px;border-radius:20px;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
+.pr-title-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pr-title{font-size:20px;font-weight:700;color:var(--text);line-height:1.3}
+.pr-link{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:7px;padding:8px 18px;white-space:nowrap;transition:opacity .15s}
+.pr-link:hover{opacity:.8}
+.pr-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.pr-meta-item{display:flex;align-items:center;gap:5px}
+.pr-meta-label{font-weight:600;color:var(--text-4);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.pr-meta-val{font-family:var(--mono);font-size:12.5px;color:var(--text-2)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.stat-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px}
+.stat-num{font-size:32px;font-weight:700;font-family:var(--mono);line-height:1;font-variant-numeric:tabular-nums}
+.n-total{color:var(--text)}.n-notrun{color:var(--notrun)}.n-pass{color:var(--pass)}.n-fail{color:var(--fail)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+.card-head{padding:13px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface-2)}
+.card-head-title{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3)}
+.card-hint{margin-left:auto;font-size:12px;color:var(--text-4);font-style:italic}
+.impact-block{padding:0 20px 8px}
+.impact-label{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3);padding:14px 0 10px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.impact-row{display:grid;grid-template-columns:220px 140px 1fr;gap:16px;padding:13px 0;border-bottom:1px solid var(--border);align-items:start}
+.impact-row:last-child{border-bottom:none}
+.im-module{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:600}
+.im-range{display:inline-block;font-family:var(--mono);font-size:12px;color:var(--text-3);background:var(--surface-3);border:1px solid var(--border-2);padding:3px 9px;border-radius:4px}
+.im-reason{font-size:13.5px;color:var(--text-2);line-height:1.65}
+.new-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:baseline}
+.new-row:last-child{border-bottom:none}
+.new-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:8px}
+.new-text{font-size:13.5px;color:var(--text-2);line-height:1.65}
+.new-module{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:700}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+col.c-id{width:62px}col.c-surf{width:160px}col.c-pre{width:14%}col.c-step{width:18%}col.c-exp{width:18%}col.c-data{width:14%}col.c-stat{width:90px}
+th{padding:11px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);background:var(--surface-2);border-bottom:2px solid var(--border);white-space:nowrap}
+th.c-stat-h{text-align:center}
+td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text-2);vertical-align:top;line-height:1.65;word-break:break-word;overflow-wrap:anywhere}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface-2)}
+.t-id{font-family:var(--mono);font-size:11px;color:var(--text-3);white-space:nowrap}
+.t-mod{font-family:var(--mono);font-size:12px;color:var(--accent);display:block;margin-bottom:5px;font-weight:700}
+.t-surface{font-size:14px;font-weight:600;color:var(--text)}
+.steps ol{padding-left:16px;display:flex;flex-direction:column;gap:4px}
+.steps li{color:var(--text-2)}
+.status-cell{text-align:center;vertical-align:middle}
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:5px 12px;border-radius:20px;cursor:pointer;user-select:none;border:1px solid;transition:opacity .1s,transform .08s;white-space:nowrap}
+.chip:hover{opacity:.8}.chip:active{transform:scale(.95)}
+.chip[data-s="notrun"]{background:var(--notrun-bg);color:var(--notrun);border-color:var(--notrun-border)}
+.chip[data-s="pass"]{background:var(--pass-bg);color:var(--pass);border-color:var(--pass-border)}
+.chip[data-s="fail"]{background:var(--fail-bg);color:var(--fail);border-color:var(--fail-border)}
+.chip::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.footer{padding:12px 20px;border-top:1px solid var(--border);background:var(--surface-2);display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);color:var(--text-4)}
+</style>
+</head>
+<body>
+<div class="header">
+  <span class="header-logo">🧪 QE Test Plan</span>
+</div>
+<div class="main">
+  <div class="pr-card">
+    <div class="pr-number-row">
+      <span class="pr-badge">PR #4826</span>
+    </div>
+    <div class="pr-title-row">
+      <div class="pr-title">feat(saige): add dedicated screen chat updates and DS theming</div>
+      <a class="pr-link" href="https://github.com/cialfo/app-cialfo-core-web/pull/4826" target="_blank">↗ View on GitHub</a>
+    </div>
+    <div class="pr-meta">
+      <div class="pr-meta-item"><span class="pr-meta-label">Branch</span><span class="pr-meta-val">engineer/saige-ds-colors-2026-08-05</span></div>
+      <div class="pr-meta-item"><span class="pr-meta-label">Date</span><span class="pr-meta-val">2026-08-05</span></div>
+      <div class="pr-meta-item"><span class="pr-meta-label">Repo</span><span class="pr-meta-val">cialfo/app-cialfo-core-web</span></div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Total</div><div class="stat-num n-total">9</div></div>
+    <div class="stat"><div class="stat-label">Not Run</div><div class="stat-num n-notrun" id="c-notrun">9</div></div>
+    <div class="stat"><div class="stat-label">Pass</div><div class="stat-num n-pass" id="c-pass">0</div></div>
+    <div class="stat"><div class="stat-label">Fail</div><div class="stat-num n-fail" id="c-fail">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-head-title">Impact</span></div>
+    
+    <div class="impact-block">
+      <div class="impact-label">Regression</div>
+      
+        <div class="impact-row">
+          <span class="im-module">Dashboards &amp; Reports — Student Dashboard</span>
+          <span class="im-range">TC-STUD — Saige banner TCs (4)</span>
+          <span class="im-reason">openSaige() now defaults to the dedicated full-screen surface instead of the drawer. The banner&#x27;s helper-pill and &#x27;Ask Saige&#x27; click handlers call openAiService.openSaige() with no surface option, so they now navigate to /saige with a minted chat instead of opening the drawer overlay — the existing TCs assert drawer behaviour.</span>
+        </div>
+        <div class="impact-row">
+          <span class="im-module">Apps — Direct Apply</span>
+          <span class="im-range">TC-DA — UCAS personal statement TCs (2)</span>
+          <span class="im-reason">direct-apply-iframe.component.ts now explicitly passes { surface: &#x27;drawer&#x27; } to openSaige() for the personal-statement review, preserving drawer behaviour by design, but the call signature changed (2nd arg type changed from an inline object to SaigeHook, 3rd arg added) — worth a regression pass to confirm the review still opens over the form rather than navigating away from it.</span>
+        </div>
+        <div class="impact-row">
+          <span class="im-module">Discovery &amp; Research — Scholarships</span>
+          <span class="im-range">Any TC that opens Saige via a scholarships CTA</span>
+          <span class="im-reason">Same openSaige() default-surface change as the student dashboard — any entry point calling openAiService.openSaige() without an explicit surface now lands on the dedicated screen, not the drawer.</span>
+        </div>
+    </div>
+    
+    <div class="impact-block">
+      <div class="impact-label">New Surfaces</div>
+      
+        <div class="new-row">
+          <div class="new-dot"></div>
+          <div class="new-text"><span class="new-module">Dashboards &amp; Reports — Student Dashboard / Counselor Dashboard (top nav)</span> — The Saige entry points (top-nav mascot, dashboard banner, helper pills) now open a full-screen dedicated chat surface at /saige by default instead of the 50%-width drawer. This is new behaviour layered on top of PR #4819&#x27;s still-unmerged /saige route — this PR (#4826) adds the actual exit paths (topbar &#x27;X&#x27;, rail &#x27;Back to Cialfo&#x27; footer), a &#x27;collapse to sidebar&#x27; action that hands the open chat back to the drawer, and a &#x27;switch blocked while replying&#x27; guard on both the drawer&#x27;s expand button and the full screen&#x27;s collapse button.</div>
+        </div>
+        <div class="new-row">
+          <div class="new-dot"></div>
+          <div class="new-text"><span class="new-module">Apps — Direct Apply (personal-statement review)</span> — Personal-statement review now always starts on a brand-new chat (openSaige is called with a hook that forces SaigeChatsService.startNewChat()), rather than possibly continuing whatever chat was most recently active. Same rule was added to the drawer sidebar&#x27;s own chat-resolution logic.</div>
+        </div>
+        <div class="new-row">
+          <div class="new-dot"></div>
+          <div class="new-text"><span class="new-module">N/A — chat surface UI (component-level, not yet an existing TC module)</span> — Suggestion chips in the chat transcript now collapse to 2 visible chips at rest with a &#x27;+N more&#x27; / &#x27;Show fewer&#x27; toggle pill, instead of always showing every suggestion. Applies to both the drawer and the full screen since both render app-saige-chat.</div>
+        </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <span class="card-head-title">Test Plan</span>
+      <span class="card-hint">Click a status chip to cycle: NOT RUN → PASS → FAIL</span>
+    </div>
+    <div class="scroll">
+      <table>
+        <colgroup>
+          <col class="c-id"><col class="c-surf"><col class="c-pre">
+          <col class="c-step"><col class="c-exp"><col class="c-data"><col class="c-stat">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Surface</th>
+            <th>Preconditions</th>
+            <th>Steps</th>
+            <th>Expected Result</th>
+            <th>Data Requirements</th>
+            <th class="c-stat-h">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td class="t-id">TP-001</td>
+          <td><span class="t-mod">Dashboards &amp; Reports — Student Dashboard</span><span class="t-surface">Saige entry — dedicated screen default</span></td>
+          <td>Logged in as a student on a tenant with tenant.enable_openai = true. On the student dashboard.</td>
+          <td><div class="steps"><ol><li>Click the &#x27;Ask Saige&#x27; button or any helper pill on the Saige banner</li><li>Observe the resulting surface</li></ol></div></td>
+          <td>The app navigates to /saige (a new chat is minted for a helper-pill click since it carries a canned prompt); the drawer does NOT open. The composer shows the canned question already answered/streaming.</td>
+          <td>Student user; tenant with enable_openai on</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-002</td>
+          <td><span class="t-mod">Dashboards &amp; Reports — Student Dashboard</span><span class="t-surface">Saige entry — top-nav mascot default</span></td>
+          <td>Logged in as a student or counselor, Saige nav item visible in the top nav.</td>
+          <td><div class="steps"><ol><li>Click the Saige mascot icon in the top nav (no canned prompt)</li><li>Observe the resulting surface</li></ol></div></td>
+          <td>Navigates to /saige and resumes the most-recently-updated chat (no new chat minted, since there is no prompt).</td>
+          <td>User with at least one prior Saige chat, to verify resume-most-recent</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-003</td>
+          <td><span class="t-mod">Apps — Direct Apply</span><span class="t-surface">Personal-statement review stays in the drawer</span></td>
+          <td>Student on a Direct Apply application form with a personal statement written.</td>
+          <td><div class="steps"><ol><li>Trigger &#x27;Analyze my personal statement&#x27; from the DA form</li><li>Observe the resulting surface and the form behind it</li></ol></div></td>
+          <td>The Saige drawer opens (50% width) over the still-visible DA form — it must NOT navigate to /saige. The review starts in a brand-new chat, not appended to an existing one.</td>
+          <td>Student user; Direct Apply application in progress with a saved personal statement</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-004</td>
+          <td><span class="t-mod">N/A — dedicated screen exits</span><span class="t-surface">Full-screen &#x27;X&#x27; (topbar) and rail &#x27;Back to Cialfo&#x27; footer</span></td>
+          <td>On /saige, having navigated there from a known page (e.g. a student profile page with query params/fragment).</td>
+          <td><div class="steps"><ol><li>Click the topbar &#x27;X&#x27;</li><li>Re-open Saige from the same starting page, then click the rail footer&#x27;s &#x27;Back to Cialfo&#x27; link instead</li></ol></div></td>
+          <td>Both exits return the user to the exact page (including query params/fragment) they opened Saige from. If Saige was reached via a deep link or refresh (no stored entry URL), it falls back to the student&#x27;s own /:studentId/home, or /counselor_dashboard for a counselor/admin.</td>
+          <td>Student and counselor/admin accounts to check both fallback destinations</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-005</td>
+          <td><span class="t-mod">N/A — dedicated screen ↔ drawer handoff</span><span class="t-surface">Collapse full screen to sidebar drawer</span></td>
+          <td>On /saige with an active chat open, not currently streaming a reply.</td>
+          <td><div class="steps"><ol><li>Click the &#x27;Back to sidebar&#x27; (compress) icon in the topbar</li></ol></div></td>
+          <td>Navigates back to the page Saige was opened from (or the role-based fallback) and immediately opens the drawer resumed on the exact same chat — conversation is not lost or restarted.</td>
+          <td>Any user with an active, non-empty Saige chat</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-006</td>
+          <td><span class="t-mod">N/A — surface-switch guard while streaming</span><span class="t-surface">Expand/collapse disabled mid-reply</span></td>
+          <td>A message has just been sent and Saige is actively streaming a reply, in either the drawer or the full screen.</td>
+          <td><div class="steps"><ol><li>While the reply is still streaming, attempt to click the drawer&#x27;s expand icon, or the full screen&#x27;s collapse icon</li><li>Hover the disabled control</li></ol></div></td>
+          <td>The control is disabled (click does nothing) and its tooltip reads &#x27;Available once Saige finishes replying&#x27;. Once the stream completes, the control re-enables and works normally.</td>
+          <td>A Saige query guaranteed to take a few seconds to answer, to give a reliable streaming window</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-007</td>
+          <td><span class="t-mod">N/A — chat transcript UI</span><span class="t-surface">Suggestion chip collapse/expand</span></td>
+          <td>A Saige turn has completed and returned more than 2 follow-up suggestions.</td>
+          <td><div class="steps"><ol><li>Observe the suggestions row after a reply with &gt;2 suggestions</li><li>Click the &#x27;+N more&#x27; pill</li><li>Click &#x27;Show fewer&#x27;</li><li>Send another message and get a fresh set of suggestions</li></ol></div></td>
+          <td>At rest only 2 suggestion chips show plus a &#x27;+N more&#x27; pill. Clicking it reveals all suggestions and swaps the pill to &#x27;Show fewer&#x27;. Clicking &#x27;Show fewer&#x27; re-collapses to 2. A new turn&#x27;s suggestions always start collapsed again, regardless of the prior expand state.</td>
+          <td>A query that reliably returns more than 2 suggested follow-ups (e.g. a broad open-ended question)</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-008</td>
+          <td><span class="t-mod">N/A — role-scoped behaviour</span><span class="t-surface">Uni-invite eligibility check skipped for counselor</span></td>
+          <td>Logged in as a counselor, using the Saige chat (either surface).</td>
+          <td><div class="steps"><ol><li>As a counselor, trigger a flow inside Saige chat that would normally check uni-invite eligibility for a student (e.g. viewing/asking about a university)</li><li>Watch the network tab for a GET to v4/students/:id</li></ol></div></td>
+          <td>No GET v4/students/:id request fires for a counselor session (checkForUniInvite() now early-returns when !isStudent). No console error, and no uni-invite CTA appears incorrectly.</td>
+          <td>Counselor account; student account for comparison (same flow should still fire the eligibility check for students)</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-009</td>
+          <td><span class="t-mod">N/A — visual/DS theming regression</span><span class="t-surface">Saige color theming (drawer, full screen, top nav, student dashboard banner)</span></td>
+          <td>Any Saige surface visible: drawer, /saige full screen, top-nav mascot icon, student-dashboard Saige banner.</td>
+          <td><div class="steps"><ol><li>Visually inspect each surface: chat bubbles, CTA buttons, feedback icons, mascot halo gradient, suggestion chips, send button, recording banner, rail sidebar (full screen), student-dashboard banner CTA</li></ol></div></td>
+          <td>All Saige-branded elements now render in the new blue/navy/amber palette (previously purple) consistently across every surface — no leftover purple (#8864E2 / highlight-base) anywhere in a Saige-specific element, and no contrast regressions (e.g. the send button icon, the CTA buttons, the dashboard banner CTA text stay legible against their backgrounds).</td>
+          <td>None — visual check only</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr></tbody>
+      </table>
+    </div>
+    <div class="footer">
+      <span>Formal TCs authored post-merge via docs-sync → TC maintenance</span>
+      <span>qe-automation · staging.cialfo.sg</span>
+    </div>
+  </div>
+</div>
+<script>
+const C=['notrun','pass','fail'],L={notrun:'NOT RUN',pass:'PASS',fail:'FAIL'};
+function cycle(el){
+  const n=C[(C.indexOf(el.dataset.s)+1)%3];
+  el.dataset.s=n;el.textContent=L[n];
+  const ch=[...document.querySelectorAll('.chip')];
+  document.getElementById('c-notrun').textContent=ch.filter(c=>c.dataset.s==='notrun').length;
+  document.getElementById('c-pass').textContent=ch.filter(c=>c.dataset.s==='pass').length;
+  document.getElementById('c-fail').textContent=ch.filter(c=>c.dataset.s==='fail').length;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: specs/onboarding/quiz.spec.ts >> ONBRD — Onboarding Quiz >> TC-ONBRD — Student in grade 10 or below completes the pre-quiz only
+- Location: tests/specs/onboarding/quiz.spec.ts:56:7
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: getByRole('link', { name: 'Universities' })
+Expected: visible
+Timeout: 60000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 60000ms
+  - waiting for getByRole('link', { name: 'Universities' })
+    - waiting for navigation to finish...
+    - navigated to "https://qe-automation.cialfo.sg/app/auth"
+
+```
+
+```yaml
+- link "Cialfo logo Sign up for clearing updates Study at a Top 20 UK university 7500 Scholarships available Guaranteed accommodations Sign up for clearing updates":
+  - img "Cialfo logo"
+  - paragraph: Sign up for clearing updates
+  - paragraph: Study at a Top 20 UK university
+  - paragraph: 7500 Scholarships available
+  - paragraph: Guaranteed accommodations
+  - img "Sign up for clearing updates"
+- text: QE Automation
+- heading "Sign In" [level=1]: Good morning
+- paragraph: Sign in to continue — students and counselors, all in one place.
+- text: QS QE Student 06mjeh7hs Not you? Password
+- textbox "Password"
+- checkbox "Remember me" [checked]
+- text: Remember me Forgot Password? Sign In or continue with
+- img "Google logo"
+- text: Google
+- img "Microsoft logo"
+- text: Microsoft  Phone Number Students, if you do not have an account sign up here. Student Signup
+```
+
+# Test source
+
+```ts
+  1  | import { expect, Locator, Page } from '@playwright/test';
+  2  | import { BasePage } from '../base.page';
+  3  | import { loginWithRedirect } from '../../core/login';
+  4  | import { PhoneVerificationNudgeModal } from './components/phone-verification-nudge.modal';
+  5  | 
+  6  | // Student home page at /app/:id/home.
+  7  | export class StudentHomePage extends BasePage {
+  8  |   // Locators
+  9  |   readonly path: string;
+  10 |   readonly homeLink: Locator;
+  11 |   readonly universitiesLink: Locator;
+  12 |   private readonly phoneNudge: PhoneVerificationNudgeModal;
+  13 | 
+  14 |   constructor(page: Page, userId: string | number) {
+  15 |     super(page);
+  16 |     this.path = `/app/${userId}/home`;
+  17 |     this.homeLink = page.getByRole('link', { name: 'Home' });
+  18 |     this.universitiesLink = page.getByRole('link', { name: 'Universities' });
+  19 |     this.phoneNudge = new PhoneVerificationNudgeModal(page);
+  20 |   }
+  21 | 
+  22 |   // Logs in without a UI form, navigates to this page, and waits until ready.
+  23 |   // @param user object carrying the email address to log in with
+  24 |   async open(user: { email: string }) {
+  25 |     await loginWithRedirect(this.page, user.email, this.path);
+  26 |     await this.waitForLoaded();
+  27 |   }
+  28 | 
+  29 |   // Waits for the student home page to be visible.
+  30 |   async waitForLoaded() {
+  31 |     await this.page.waitForURL(/\/app\/\d+\/home/);
+  32 |     await expect(this.homeLink).toBeVisible();
+> 33 |     await expect(this.universitiesLink).toBeVisible();
+     |                                         ^ Error: expect(locator).toBeVisible() failed
+  34 |   }
+  35 | 
+  36 |   // Actions
+  37 | 
+  38 |   // Dismisses the phone-verification nudge dialog if it is present.
+  39 |   async dismissPhoneVerificationNudgeIfPresent() {
+  40 |     await this.phoneNudge.dismissIfPresent();
+  41 |   }
+  42 | 
+  43 |   // Assertions
+  44 | 
+  45 |   // Asserts the browser has navigated to this student's home page — URL only, for a
+  46 |   // viewer (e.g. a guardian) who doesn't see the student's own Home/Universities nav.
+  47 |   async expectOnStudentHome() {
+  48 |     await expect(this.page).toHaveURL(new RegExp(this.path));
+  49 |   }
+  50 | }
+```

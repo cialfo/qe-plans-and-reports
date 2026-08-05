@@ -2,16 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Cialfo QE Test Plans</title>
+<title>Cialfo QE Plans &amp; Reports</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0A0A0A;color:#EEE;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:40px 32px}
 h1{font-size:20px;font-weight:600;margin-bottom:8px}
-p{font-size:13px;color:#666;margin-bottom:32px;font-family:ui-monospace,monospace}
+p{font-size:13px;color:#666;margin-bottom:8px;font-family:ui-monospace,monospace}
+ul{font-size:13px;color:#999;font-family:ui-monospace,monospace;margin:16px 0 0 20px}
+li{margin-bottom:6px}
+code{color:#EEE}
 </style>
 </head>
 <body>
-<h1>Cialfo QE Test Plans</h1>
-<p>Test plans are published per PR by the QE automation agent · cialfo/app-cialfo-core-web</p>
+<h1>Cialfo QE Plans &amp; Reports</h1>
+<p>Published per PR against cialfo/app-cialfo-core-web — no index/browse page, link directly to a known path:</p>
+<ul>
+<li><code>pr-&lt;PR_NUMBER&gt;/</code> — a test plan, published by the Paperclip QE automation agent</li>
+<li><code>regression-pr-&lt;PR_NUMBER&gt;/&lt;run_id&gt;/</code> — an Allure regression report, published by core-pw-e2e-tests CI (<code>/execute-regression-suite</code>)</li>
+</ul>
 </body>
 </html>

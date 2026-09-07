@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test Plan — PR #5196</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;
+  --surface:#ffffff;
+  --surface-2:#f8f9fb;
+  --surface-3:#f3f4f6;
+  --border:#e5e7eb;
+  --border-2:#d1d5db;
+  --text:#111827;
+  --text-2:#374151;
+  --text-3:#6b7280;
+  --text-4:#9ca3af;
+  --accent:#2563eb;
+  --accent-bg:#eff6ff;
+  --accent-border:#bfdbfe;
+  --pass:#059669;--pass-bg:#f0fdf4;--pass-border:#a7f3d0;
+  --fail:#dc2626;--fail-bg:#fef2f2;--fail-border:#fecaca;
+  --notrun-bg:#f9fafb;--notrun-border:#e5e7eb;--notrun:#6b7280;
+  --mono:'SF Mono','Fira Code',Consolas,'Courier New',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --r:8px;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+}
+html{font-size:14px;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.65;min-height:100vh}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:11px 32px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.header-logo{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
+.main{padding:24px 32px;display:flex;flex-direction:column;gap:20px}
+.pr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 24px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.pr-number-row{display:flex;align-items:center;gap:10px}
+.pr-badge{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);padding:3px 11px;border-radius:20px;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
+.pr-title-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pr-title{font-size:20px;font-weight:700;color:var(--text);line-height:1.3}
+.pr-link{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:7px;padding:8px 18px;white-space:nowrap;transition:opacity .15s}
+.pr-link:hover{opacity:.8}
+.pr-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.pr-meta-item{display:flex;align-items:center;gap:5px}
+.pr-meta-label{font-weight:600;color:var(--text-4);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.pr-meta-val{font-family:var(--mono);font-size:12.5px;color:var(--text-2)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.stat-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px}
+.stat-num{font-size:32px;font-weight:700;font-family:var(--mono);line-height:1;font-variant-numeric:tabular-nums}
+.n-total{color:var(--text)}.n-notrun{color:var(--notrun)}.n-pass{color:var(--pass)}.n-fail{color:var(--fail)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+.card-head{padding:13px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface-2)}
+.card-head-title{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3)}
+.card-hint{margin-left:auto;font-size:12px;color:var(--text-4);font-style:italic}
+.impact-block{padding:0 20px 8px}
+.impact-label{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3);padding:14px 0 10px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.impact-row{display:grid;grid-template-columns:220px 140px 1fr;gap:16px;padding:13px 0;border-bottom:1px solid var(--border);align-items:start}
+.impact-row:last-child{border-bottom:none}
+.im-module{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:600}
+.im-range{display:inline-block;font-family:var(--mono);font-size:12px;color:var(--text-3);background:var(--surface-3);border:1px solid var(--border-2);padding:3px 9px;border-radius:4px}
+.im-reason{font-size:13.5px;color:var(--text-2);line-height:1.65}
+.new-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:baseline}
+.new-row:last-child{border-bottom:none}
+.new-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:8px}
+.new-text{font-size:13.5px;color:var(--text-2);line-height:1.65}
+.new-module{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:700}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+col.c-id{width:62px}col.c-surf{width:160px}col.c-pre{width:14%}col.c-step{width:18%}col.c-exp{width:18%}col.c-data{width:14%}col.c-stat{width:90px}
+th{padding:11px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);background:var(--surface-2);border-bottom:2px solid var(--border);white-space:nowrap}
+th.c-stat-h{text-align:center}
+td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text-2);vertical-align:top;line-height:1.65;word-break:break-word;overflow-wrap:anywhere}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface-2)}
+.t-id{font-family:var(--mono);font-size:11px;color:var(--text-3);white-space:nowrap}
+.t-mod{font-family:var(--mono);font-size:12px;color:var(--accent);display:block;margin-bottom:5px;font-weight:700}
+.t-surface{font-size:14px;font-weight:600;color:var(--text)}
+.steps ol{padding-left:16px;display:flex;flex-direction:column;gap:4px}
+.steps li{color:var(--text-2)}
+.status-cell{text-align:center;vertical-align:middle}
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:5px 12px;border-radius:20px;cursor:pointer;user-select:none;border:1px solid;transition:opacity .1s,transform .08s;white-space:nowrap}
+.chip:hover{opacity:.8}.chip:active{transform:scale(.95)}
+.chip[data-s="notrun"]{background:var(--notrun-bg);color:var(--notrun);border-color:var(--notrun-border)}
+.chip[data-s="pass"]{background:var(--pass-bg);color:var(--pass);border-color:var(--pass-border)}
+.chip[data-s="fail"]{background:var(--fail-bg);color:var(--fail);border-color:var(--fail-border)}
+.chip::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.footer{padding:12px 20px;border-top:1px solid var(--border);background:var(--surface-2);display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);color:var(--text-4)}
+</style>
+</head>
+<body>
+<div class="header">
+  <span class="header-logo">🧪 QE Test Plan</span>
+</div>
+<div class="main">
+  <div class="pr-card">
+    <div class="pr-number-row">
+      <span class="pr-badge">PR #5196</span>
+    </div>
+    <div class="pr-title-row">
+      <div class="pr-title">Rebuild the student Applications page as applications-v7</div>
+      <a class="pr-link" href="https://github.com/cialfo/app-cialfo-core-web/pull/5196" target="_blank">↗ View on GitHub</a>
+    </div>
+    <div class="pr-meta">
+      <div class="pr-meta-item"><span class="pr-meta-label">Branch</span><span class="pr-meta-val">designer/applications-v7-from-master-2026-09-07</span></div>
+      <div class="pr-meta-item"><span class="pr-meta-label">Date</span><span class="pr-meta-val">2026-09-07</span></div>
+      <div class="pr-meta-item"><span class="pr-meta-label">Repo</span><span class="pr-meta-val">cialfo/app-cialfo-core-web</span></div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Total</div><div class="stat-num n-total">25</div></div>
+    <div class="stat"><div class="stat-label">Not Run</div><div class="stat-num n-notrun" id="c-notrun">25</div></div>
+    <div class="stat"><div class="stat-label">Pass</div><div class="stat-num n-pass" id="c-pass">0</div></div>
+    <div class="stat"><div class="stat-label">Fail</div><div class="stat-num n-fail" id="c-fail">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-head-title">Impact</span></div>
+    
+    <div class="impact-block">
+      <div class="impact-label">Regression</div>
+      
+        <div class="impact-row">
+          <span class="im-module">Apps — Applications</span>
+          <span class="im-range">TC-APPL (93 TCs)</span>
+          <span class="im-reason">The only production-visible change in this PR is a new &lt;app-v7-beta-return&gt; pill added to the live v5 home.component.html header row, next to the existing Add Application button. It self-gates on environment.name !== &#x27;production&#x27;, so it must render as a true no-op on a production build, but on staging (where this PR&#x27;s routes ARE registered) the header row layout changes. Existing Add Application, tab-bar, and header-row TCs need a pass to confirm no layout/interaction regression from the new sibling element, and that the pill itself is invisible/absent when environment.name is forced to &#x27;production&#x27;.</span>
+        </div>
+        <div class="impact-row">
+          <span class="im-module">Apps — Applications</span>
+          <span class="im-range">TC-APPL — Student adds a university to the Applying list via + Add application</span>
+          <span class="im-reason">PR author explicitly flags this as unverified: a three-step add dialog built earlier on this branch was deleted on 7 Sep 2026, and onAdd()/onAddForUniversity() were collapsed back onto the platform&#x27;s existing openPlatformAdd (AddApplicationModalComponent) — the same flow every non-beta student already uses. Nothing in the add flow itself changed, but the removal has not been re-verified in a browser. Re-run the existing add-application TC against the v7 screen specifically.</span>
+        </div>
+    </div>
+    
+    <div class="impact-block">
+      <div class="impact-label">New Surfaces</div>
+      
+        <div class="new-row">
+          <div class="new-dot"></div>
+          <div class="new-text"><span class="new-module">Apps — Applications</span> — Full rebuild of the student Applications page as &#x27;applications-v7&#x27; — reachable via a canMatch guard (applicationsOnNewVersion) that defaults every student to the new screen on staging (routes are only withheld from a true production build). Encompasses: the page shell (screen-preview) with volume-based chrome thresholds and a load-error state distinct from zero-state; a summary strip; a 4-axis split control (all/attention/step/portal); a grouped section list of application cards and UCAS/UK-DA bundles; a card kebab menu that merges a designed action set with backend-supplied actions; a detail drawer with conditional sections including a private, save-on-blur student note; a right panel with UCAS/Common App/Direct-Apply-inbox portal cards (each with its own state machine) plus a &#x27;More views&#x27; area (logins/transcripts/letters/report); a curated nav panel; a zero-state with an add-slot and profile-matched suggestions; per-stage empty states; a scroll- or timer-triggered feedback prompt; and a full beta switch-back flow (ask-why → detail → switch, a 3-strikes-then-pinned rule, a return pill on the old screen, and a one-time &#x27;welcome back&#x27; bar) that lets a student move between the new and previous screens for the duration this beta period runs.</div>
+        </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <span class="card-head-title">Test Plan</span>
+      <span class="card-hint">Click a status chip to cycle: NOT RUN → PASS → FAIL</span>
+    </div>
+    <div class="scroll">
+      <table>
+        <colgroup>
+          <col class="c-id"><col class="c-surf"><col class="c-pre">
+          <col class="c-step"><col class="c-exp"><col class="c-data"><col class="c-stat">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Surface</th>
+            <th>Preconditions</th>
+            <th>Steps</th>
+            <th>Expected Result</th>
+            <th>Data Requirements</th>
+            <th class="c-stat-h">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td class="t-id">TP-001</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Route gating — production vs. staging</span></td>
+          <td>Student account with at least one application. Two builds/environments available for comparison: one with environment.name === &#x27;production&#x27;, one without (staging).</td>
+          <td><div class="steps"><ol><li>On staging, navigate to the student Applications page.</li><li>Confirm the applications-v7 screen loads at the default path.</li><li>Repeat against a build where environment.name is &#x27;production&#x27; (or inspect the deployed production route table).</li><li>Confirm the previous (v5) screen loads instead, and that the two design-QA-only routes (panel-states, card-states) are absent.</li></ol></div></td>
+          <td>New v7 screen is the default everywhere except a true production build, where the old v5 screen renders unchanged and neither the v7 screen nor the two design-review-only routes are reachable by URL.</td>
+          <td>One student with ≥1 application, any portal.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-002</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Screen-preview — volume-threshold chrome</span></td>
+          <td>Four student accounts (or the staging ?volume=N override) with 0, 1–2, 3–5, and 6+ applications respectively.</td>
+          <td><div class="steps"><ol><li>Load the Applications page for a student with 0 applications — observe chrome.</li><li>Repeat for 1–2, then 3–5, then 6+ applications.</li></ol></div></td>
+          <td>0 apps: zero-state only. 1–2: one-line summary sentence, no summary card, no split control, no section headings. 3–5: summary card and section headings appear, split control does not. 6+: summary card, section headings, AND split control all appear.</td>
+          <td>Students seeded at each of the four volume tiers across mixed portals.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-003</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Screen-preview — load error vs. zero-state</span></td>
+          <td>A way to force the applications load request to fail (e.g. network throttling/blocking the co-api applying-list call or the DA SDK call).</td>
+          <td><div class="steps"><ol><li>Load the Applications page with the load request forced to fail or return an error code.</li><li>Observe the rendered state.</li></ol></div></td>
+          <td>A distinct load-error state renders (status/message + retry action) — the page must NOT render the &#x27;you haven&#x27;t applied anywhere yet&#x27; zero-state on a failed fetch. This guards a real prior bug where co-api&#x27;s HTTP-200-with-error-in-body envelope was silently read as an empty list.</td>
+          <td>Student with ≥1 real application (to prove the error state isn&#x27;t just coincidentally matching a real zero-app student).</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-004</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Split control — axes, disabled state, one-time hint</span></td>
+          <td>A student with 6+ applications spanning at least 3 stages and 2+ portal types (for the axis test), and a student with &lt;6 applications with a fresh browser profile (for the disabled/hint test).</td>
+          <td><div class="steps"><ol><li>On the 6+ student, switch through all/attention/step/portal axes and confirm each filters correctly (portal axis groups direct_apply and uk_da together).</li><li>Confirm a one-time tooltip hint appears near the control shortly after first landing, and does not reappear on a later visit (localStorage-gated) or after any interaction with the page.</li><li>On the &lt;6 student (below SPLIT_FROM), confirm the control renders visibly disabled with an explanatory hint rather than being hidden.</li></ol></div></td>
+          <td>All four axes filter correctly; direct_apply and uk_da share the same portal tab; the hint fires once per browser storage and is suppressed on a disabled control; below the volume threshold the control is present-but-disabled, not absent.</td>
+          <td>6+ application student across 3+ stages and Direct Apply + UK DA; separate &lt;6-application student with a clean browser profile.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-005</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Summary strip — block click filters</span></td>
+          <td>Student with ≥3 applications spanning at least two different stages.</td>
+          <td><div class="steps"><ol><li>Load the page so the summary strip renders its per-stage blocks.</li><li>Click a stage block on the summary strip.</li><li>Separately, click the equivalent stage row in the nav panel.</li><li>Compare the two resulting filtered views.</li></ol></div></td>
+          <td>Clicking a summary-strip block filters the list identically to selecting the same stage from the nav panel — same resulting set of applications, same split state. (Flags a documented behavior change: blocks now filter, reversing an earlier &#x27;blocks don&#x27;t filter&#x27; decision — worth confirming this is the intended current behavior, not a regression.)</td>
+          <td>Student with applications in ≥2 distinct stages, at least one with 2+ applications to distinguish filtered vs. unfiltered counts.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-006</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Application card — CTA routing vs. drawer vs. external tab</span></td>
+          <td>Three applications: one with an in-app-routable CTA (e.g. an offer needing a decision), one with an external-only action (UCAS or Common App portal link), one with only the synthetic view_application fallback CTA.</td>
+          <td><div class="steps"><ol><li>Click the CTA button on the in-app-route card.</li><li>Click the CTA button on the external-portal card.</li><li>Click anywhere else on the card body (not the CTA) for the view_application-only card.</li></ol></div></td>
+          <td>In-app CTA navigates within the app to the relevant screen (e.g. offers/recommendations/payment). External-portal CTA opens the portal in a new tab, page stays put. Clicking the card body when the only CTA is the synthetic view_application fallback opens the detail drawer instead of navigating.</td>
+          <td>One application per portal/CTA type described above.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-007</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Application card — tone and CTA precedence</span></td>
+          <td>Applications covering: needs-you (amber), has an unmet offer (green), closed/withdrawn (dim), and one paused/revision-requested (should show &#x27;stop&#x27; red tone).</td>
+          <td><div class="steps"><ol><li>Load the section list and inspect each card&#x27;s tone.</li><li>On the closed-application card, open the kebab menu and confirm delete_application is present only there, never as the card&#x27;s primary action button.</li><li>Confirm the paused/revision-requested application shows the red &#x27;stop&#x27; tone even though it would otherwise qualify for amber (needs-you).</li></ol></div></td>
+          <td>Tone precedence: stop (red) overrides attn (amber); closed cards show dim tone and suppress all CTAs except view_application/view_offer_details; delete_application never appears as a primary card button, only inside the kebab menu.</td>
+          <td>4 applications: needs-you, offer-with-unmet-condition, closed, paused/revision-requested.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-008</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">UCAS/UK-DA bundle — counter and denominator</span></td>
+          <td>A UCAS or UK Direct Apply application with multiple choices: one seeded with exactly 5 choices (submitted-count &lt; 5), one seeded with 6+ choices (Extra/Clearing/replaced-choice scenario).</td>
+          <td><div class="steps"><ol><li>Open the bundle for the 5-choice student and read the counter.</li><li>Open the bundle for the 6+-choice student and read the counter.</li></ol></div></td>
+          <td>Counter language reads &#x27;sent&#x27; (not &#x27;added&#x27;) and reflects submitted choices, not merely added ones. The &#x27;/5&#x27; denominator is shown for the ≤5-choice student and dropped entirely once real choices exceed 5.</td>
+          <td>UCAS/UK-DA student with exactly 5 choices, and a second with 6+ choices (Extra or Clearing scenario).</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-009</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Card-menu — backend action merge</span></td>
+          <td>An application whose backend actions[] payload includes at least one of view_authorization_form, change_portal, or change_program_choice — an action not named in the component&#x27;s own per-stage menu-set constant.</td>
+          <td><div class="steps"><ol><li>Open the kebab menu on that application&#x27;s card.</li><li>Inspect the ordering of menu items relative to the destructive-action divider.</li></ol></div></td>
+          <td>The backend-only action is present in the menu body, above the divider, never mixed in with or after the destructive (danger-toned) actions below the divider.</td>
+          <td>Application with one of the three named backend-only actions present in its actions[] field.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-010</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Detail drawer — conditional sections &amp; private note</span></td>
+          <td>One application with no note/private-note/documents set (to check suppression) and one with all fields set, including a bundle sibling (for &#x27;Your choices&#x27;).</td>
+          <td><div class="steps"><ol><li>Open the drawer on the minimal application — confirm empty sections don&#x27;t render (no &#x27;Application details&#x27; fields shown if none set, no &#x27;Your choices&#x27; if not part of a bundle).</li><li>Open the drawer on the fully-populated application — confirm every section renders.</li><li>Type into the private note field, blur, then force the save request to fail (e.g. network block) and blur again after retry.</li><li>Close and reopen the drawer.</li></ol></div></td>
+          <td>Sections with no data are omitted entirely, not rendered empty. Private note is optimistic: on save failure the typed text is never reverted, and a distinct saving/saved/failed indicator is shown at each stage.</td>
+          <td>One minimal application, one fully-populated bundle application; ability to simulate a failed PUT on the private-note endpoint.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-011</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Right panel — hasApplications gate</span></td>
+          <td>A student whose only application is on an &#x27;Other&#x27; portal (not Common App/UCAS/Direct Apply) — this is the scenario the PR explicitly says was previously mis-rendered as empty.</td>
+          <td><div class="steps"><ol><li>Load the Applications page for that student.</li><li>Inspect the right panel.</li></ol></div></td>
+          <td>The right panel shows the Documents &amp; reports card (or relevant portal card), not the Saige empty-state hero — hasApplications correctly counts the Other-portal application even though it contributes to none of the three named portal card totals directly.</td>
+          <td>Student with exactly one application, on a portal outside Common App/UCAS/Direct Apply.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-012</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Right panel — UCAS card state machine</span></td>
+          <td>Students/tenants covering: not_applicable (tenant has no UCAS), no_account with a configured buzzword, no_account without a buzzword configured, creating, ready, and submitted.</td>
+          <td><div class="steps"><ol><li>For each state, load the right panel&#x27;s UCAS card and confirm the rendered content matches that state.</li><li>On the no_account state with a buzzword configured, confirm both forks render (&#x27;Cialfo opens one&#x27; and &#x27;I already have one&#x27;); without a buzzword, confirm only the first fork renders.</li><li>Click through the &#x27;I already have one&#x27; fork into the UCAS-link modal, attempt to link, and observe the result.</li></ol></div></td>
+          <td>Each of the 6 states (not_applicable/no_account/creating/ready/linked/submitted) renders its documented content. The second no_account fork is buzzword-gated. Attempting to complete the link-existing-account flow via the modal shows a &#x27;not available yet&#x27; message — this is a known, by-design dead end (no backend), not a bug, but must fail gracefully rather than erroring or hanging.</td>
+          <td>Tenant/student combinations covering each of the 6 named UCAS states; at least one tenant with a UCAS buzzword configured and one without.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-013</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Right panel — Common App &amp; Direct Apply inbox cards</span></td>
+          <td>Students covering Common App not_linked, linked_ferpa_pending, linked; and Direct Apply inbox provisioning, active, out_of_sync.</td>
+          <td><div class="steps"><ol><li>For each Common App state, load the right panel and confirm rendered content; on not_linked, click Connect and confirm it routes to the recommendations page&#x27;s existing link flow.</li><li>For each Direct Apply inbox state, load the right panel; on out_of_sync, click the re-sync action and confirm it navigates to the explore-mail page.</li></ol></div></td>
+          <td>Common App: not_linked shows Connect → routes to recommendations; linked_ferpa_pending shows the FERPA warning; linked shows locked min/max LOR rows with an unlocked &#x27;requested&#x27; count. Direct Apply inbox: provisioning shows no action (system-assigned); active shows mailto/external link; out_of_sync shows the Zoho-sync-stopped banner and re-sync action that navigates to explore-mail.</td>
+          <td>Students in each of the 3 Common App states and 3 Direct Apply inbox states.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-014</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Nav panel — row curation</span></td>
+          <td>A student with zero applications in at least one stage (so that stage&#x27;s nav row should be suppressed) and zero pending in an entire group (e.g. no UCAS/Common App/Other applications at all, so &#x27;Applied elsewhere&#x27; group should not render).</td>
+          <td><div class="steps"><ol><li>Load the nav panel.</li><li>Confirm the zero-count stage row is absent.</li><li>Confirm &#x27;All applications&#x27; is still present and pinned even though other rows are zero.</li><li>Confirm the group with zero total rows renders no heading/divider at all.</li></ol></div></td>
+          <td>Any row with count 0 is omitted except &#x27;All applications&#x27;, which always renders. A group whose every child row is zero renders nothing for that group, not even its heading/divider.</td>
+          <td>Student with at least one empty stage and one entirely-empty group (e.g. no UCAS/Common App/Other applications).</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-015</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Beta switch-back — full ask/detail/switch flow</span></td>
+          <td>Student on the new (v7) screen, streak below the 3-strike limit.</td>
+          <td><div class="steps"><ol><li>Open the beta pill&#x27;s menu and choose to switch back.</li><li>Select one of the 5 reason chips (e.g. &#x27;cant_find&#x27;).</li><li>On the detail screen, leave the optional textarea blank and choose &#x27;Just switch&#x27;.</li><li>Repeat the flow, this time typing &gt;400 characters into the textarea (confirm the counter appears only from 400 chars) and choosing &#x27;Send and switch&#x27;.</li><li>Repeat the flow once more but dismiss via Escape/outside-click partway through the ask/detail screens instead of completing it.</li></ol></div></td>
+          <td>Both &#x27;Just switch&#x27; and &#x27;Send and switch&#x27; switch the student to the old screen; the record POST is fire-and-forget and never blocks the switch. A confirmation screen shows and auto-navigates after ~2.2s. Dismissing via Escape or outside click does NOT switch the student — this is a deliberate behavior change from an earlier build where dismiss counted as skip-and-switch.</td>
+          <td>One student account, streak reset to 0 before the test.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-016</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Beta switch-back — 3-strike streak pin</span></td>
+          <td>A student account whose switch-back streak can be driven to 3 (via 3 consecutive sessions that each switch back without an intervening session that stays on the new screen).</td>
+          <td><div class="steps"><ol><li>Switch back 3 times across 3 separate sessions, never staying on the new screen in between.</li><li>Start a 4th session and observe which screen the student lands on and how the pill/menu presents.</li><li>In a separate run, stay on the new screen for one full session after 2 switch-backs, then start a new session and confirm the streak was reset rather than continuing toward 3.</li></ol></div></td>
+          <td>After 3 consecutive switch-back sessions, the account is held on the previous screen for subsequent sessions (heldBack$ true) and the pill/menu presents accordingly, per the code&#x27;s own comments (offering the new version rather than a plain switch). Staying on the new screen for one session (recordStayed) resets the streak to 0.</td>
+          <td>One student account, ability to reset/inspect its switch-back streak state between test runs.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-017</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Beta-return pill &amp; back-bar on the old screen</span></td>
+          <td>A student who has switched back to the old screen, with at least one shipped change recorded since their switched_away_at timestamp; and a build with environment.name forced to &#x27;production&#x27; for the gating check.</td>
+          <td><div class="steps"><ol><li>On staging, load the old (v5) Applications screen for a student who has never switched away — confirm the pill is still shown (per the 2 Sep 2026 &#x27;always shown&#x27; design decision).</li><li>For a student with shipped changes since switched_away_at, hover the pill and confirm the dot and note render the correct shipped-changes copy.</li><li>Load the old screen for the first time this session and confirm the one-time back-bar appears, thanking the student without echoing back the reason they gave when switching away; reload and confirm it does not reappear.</li><li>Force environment.name to &#x27;production&#x27; and confirm the pill renders nothing at all.</li></ol></div></td>
+          <td>Pill always renders on non-production builds regardless of switch history; dot/note appear only when something has shipped since the student left; back-bar shows exactly once (account-level, not per-device) and never repeats the student&#x27;s stated switch-back reason; on a production build the pill is fully absent.</td>
+          <td>Student who never switched away; student who switched away before at least one dated entry in the shipped-changes constant; ability to toggle environment.name for the production-gate check.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-018</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Feedback-ask — trigger conditions</span></td>
+          <td>Two students: one with a long enough application list to scroll, one with a short list that never fills the viewport; fresh session for each.</td>
+          <td><div class="steps"><ol><li>On the scrollable student, scroll to 60% of content or 320px (whichever comes first) and confirm the feedback prompt appears.</li><li>On the short-list student, remain idle and confirm the prompt appears via the 22-second no-scroll fallback instead.</li><li>Click &#x27;Not now&#x27; on the prompt, then check whatever rating aggregate/report the team uses to confirm the dismissal is never counted as a low star rating.</li><li>Reload the page in the same session and confirm the prompt does not reappear.</li></ol></div></td>
+          <td>Prompt fires via scroll threshold OR the 22s idle fallback, whichever applies; is suppressed while the drawer is open or the student has zero applications; fires at most once per session; &#x27;Not now&#x27; is recorded purely as a dismiss, never contributing to a rating average.</td>
+          <td>One student with enough applications to scroll, one with too few to scroll a full viewport.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-019</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Zero-state — add-slot and suggestions</span></td>
+          <td>A student with 0 applications, with an existing shortlist/longlist configured, and a separate student with no shortlist (to force the profile-matched fallback).</td>
+          <td><div class="steps"><ol><li>Load the zero-state, expand the add-slot, and use the university search — confirm it searches the entire directory, not merely the visible suggestion cards.</li><li>Confirm the suggestions section shows the student&#x27;s own shortlist/longlist entries first.</li><li>For the no-shortlist student, confirm suggestions fall back to profile-matched universities.</li></ol></div></td>
+          <td>Add-slot search reaches the full university directory (debounced ~300ms); suggestions prioritize the student&#x27;s own list before falling back to profile-matched picks; both render using the platform&#x27;s existing app-card-v2, not a custom tile.</td>
+          <td>Student with 0 applications and an existing shortlist; a second student with 0 applications and no shortlist.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-020</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Stage-empty states</span></td>
+          <td>A student with applications in some stages but a genuinely empty &#x27;closed&#x27; stage and at least one other empty stage.</td>
+          <td><div class="steps"><ol><li>Filter to each empty stage in turn via the split control&#x27;s step axis.</li><li>Inspect the empty-state copy and available actions for each, especially the closed stage.</li></ol></div></td>
+          <td>Each stage shows its own distinct empty copy and a route-to-another-stage action plus an &#x27;Ask Saige&#x27; affordance — except the closed stage, which shows no primary action at all.</td>
+          <td>Student with at least one non-closed empty stage and a genuinely empty closed stage.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-021</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Home-applications-card wiring (needs clarification)</span></td>
+          <td>A student who would qualify to see the applications accelerator card on the v5 Home dashboard (per its own needs-you filtering logic).</td>
+          <td><div class="steps"><ol><li>Load the v5 Home dashboard for that student.</li><li>Look for the applications accelerator card described in the PR&#x27;s new home-applications-card component.</li></ol></div></td>
+          <td>OPEN QUESTION, not a pass/fail check: confirm whether this card is actually reachable anywhere in the current build. The diff adds home-applications-card.component.ts/html but no reference to it was found wired into home.component.ts/html or any other template in this PR — it may be built for a follow-up PR. Flag to the author/reviewer rather than filing this as a straightforward regression.</td>
+          <td>Student who would trigger a needs-you accelerator card if one were wired in.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-022</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Role-gating — counselor / sub-agent view (self-flagged gap)</span></td>
+          <td>A counselor account with permission to view an assigned student&#x27;s Applications page, and (if available) a sub-agent-branded tenant.</td>
+          <td><div class="steps"><ol><li>As a counselor, open an assigned student&#x27;s Applications page (v7).</li><li>Check the panel-hero-card greeting — confirm whose name it greets (student&#x27;s or the logged-in counselor&#x27;s).</li><li>Attempt to save a note in the drawer&#x27;s private-note field as the counselor and observe the result.</li><li>If a sub-agent tenant is available, repeat a basic pass of the page as that role.</li></ol></div></td>
+          <td>This is the PR&#x27;s own self-flagged gap (&#x27;verified as a student&#x27; only). Expect at minimum: the hero-card greeting uses the logged-in user&#x27;s name, which the code comments acknowledge would greet the wrong person for a counselor — confirm this is indeed what happens (documented-but-not-fixed, not a silent surprise). Confirm the private-note save does not throw/error for a non-owning viewer, even though the API is documented to silently drop the write for non-owners — the UI must not show a false &#x27;saved&#x27; success in that case. Treat this whole item as exploratory: report actual behavior rather than assuming a fixed expected result.</td>
+          <td>Counselor with an assigned student who has applications; sub-agent tenant if one is provisioned for staging.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-023</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">?volume= override — inert in production</span></td>
+          <td>A staging build (non-production) and, if feasible, a production-flagged build for comparison.</td>
+          <td><div class="steps"><ol><li>On staging, load the Applications page with ?volume=2 for a student who actually has 6+ applications, and confirm the list truncates to 2 for chrome-testing purposes.</li><li>Try ?volume=0, a negative number, and a value greater than or equal to the real count — confirm each is a no-op.</li><li>On a production-flagged build, repeat the ?volume=2 case and confirm it has no effect.</li></ol></div></td>
+          <td>On staging, a valid smaller volume value truncates the rendered list for chrome-testing; blank/negative/non-integer/≥-real-count values are no-ops; on a production build the parameter has no effect regardless of value.</td>
+          <td>Student with 6+ applications; access to toggle environment.name to &#x27;production&#x27; for the negative check.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-024</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">resolveStudentId() — route param inheritance</span></td>
+          <td>Standard navigation into the Applications page via its normal ancestor route (student_id resolved from a parent route segment), plus a deep-link/refresh scenario.</td>
+          <td><div class="steps"><ol><li>Navigate to the Applications page via normal in-app navigation from a page that carries student_id in an ancestor route.</li><li>Refresh directly on the Applications URL (deep link) and confirm the correct student&#x27;s data still loads.</li><li>If feasible, navigate through an intermediate route that does not carry student_id and confirm no silent fallback to id 0.</li></ol></div></td>
+          <td>The correct student&#x27;s applications load in every navigation path — this guards a fixed bug where Angular&#x27;s default route-param inheritance dropped student_id on this route, which would otherwise silently request student 0.</td>
+          <td>Any student account with ≥1 application; a way to deep-link directly to the Applications URL.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr>
+        <tr>
+          <td class="t-id">TP-025</td>
+          <td><span class="t-mod">Apps — Applications</span><span class="t-surface">Design-review-only routes are off-product (informational)</span></td>
+          <td>None beyond a non-production build.</td>
+          <td><div class="steps"><ol><li>Attempt to navigate to the panel-states and card-states routes directly by URL on staging.</li><li>Confirm they render the design-QA gallery components, not part of any in-app navigation.</li></ol></div></td>
+          <td>Informational only — these two routes exist solely for internal design sign-off (14 portal-card states, card states) and are intentionally reachable off-production but not linked from anywhere in the product. No student-facing regression risk; do not treat as a product surface requiring ongoing coverage once the routes are removed post sign-off.</td>
+          <td>None.</td>
+          <td class="status-cell"><span class="chip" data-s="notrun" onclick="cycle(this)">NOT RUN</span></td>
+        </tr></tbody>
+      </table>
+    </div>
+    <div class="footer">
+      <span>Formal TCs authored post-merge via docs-sync → TC maintenance</span>
+      <span>qe-automation · staging.cialfo.sg</span>
+    </div>
+  </div>
+</div>
+<script>
+const C=['notrun','pass','fail'],L={notrun:'NOT RUN',pass:'PASS',fail:'FAIL'};
+function cycle(el){
+  const n=C[(C.indexOf(el.dataset.s)+1)%3];
+  el.dataset.s=n;el.textContent=L[n];
+  const ch=[...document.querySelectorAll('.chip')];
+  document.getElementById('c-notrun').textContent=ch.filter(c=>c.dataset.s==='notrun').length;
+  document.getElementById('c-pass').textContent=ch.filter(c=>c.dataset.s==='pass').length;
+  document.getElementById('c-fail').textContent=ch.filter(c=>c.dataset.s==='fail').length;
+}
+</script>
+</body>
+</html>

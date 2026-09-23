@@ -1,0 +1,206 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: specs/bi-analytics/quick-reports.cfg.spec.ts >> BIANA — Quick Reports >> TC-BIANA — Counselor runs a Quick Report end-to-end and downloads it once generation completes
+- Location: tests/specs/bi-analytics/quick-reports.cfg.spec.ts:108:7
+
+# Error details
+
+```
+Error: expect(locator).toBeEnabled() failed
+
+Locator:  getByTestId('bi-analytics-quick-reports-run-button-1')
+Expected: enabled
+Received: disabled
+Timeout:  90000ms
+
+Call log:
+  - Expect "toBeEnabled" with timeout 90000ms
+  - waiting for getByTestId('bi-analytics-quick-reports-run-button-1')
+    182 × locator resolved to <app-button-primary-link type="button" nz-tooltip="" role="button" tabindex="-1" aria-busy="false" aria-disabled="true" _ngcontent-ng-c3854726776="" data-test="bi-analytics-quick-reports-run-button-1" class="text-sm font-bold rounded-[var(--radius-sm)] focus:outline-none focus-visible:shadow-ring-focus cursor-pointer transition duration-500 fade-in inline-flex items-center webkit-appearance-none select-none h-9 gap-2 !font-semibold hover:underline focus-visible:underline !p-0 text-blue-700 hover:text-dark-blue-600 tex…>…</app-button-primary-link>
+        - unexpected value "disabled"
+
+```
+
+```yaml
+- button "Generating" [disabled]
+```
+
+# Test source
+
+```ts
+  60  |   }
+  61  | 
+  62  |   // Types into the search box, filtering visible report rows live.
+  63  |   // @param term search text (matches report name or description)
+  64  |   async search(term: string) {
+  65  |     await this.searchInput.fill(term);
+  66  |   }
+  67  | 
+  68  |   // Selects the From graduation year.
+  69  |   // @param year the year to select
+  70  |   async selectFromYear(year: number) {
+  71  |     await this.fromYearSelect.click();
+  72  |     await this.page.getByTestId(`bi-analytics-quick-reports-from-year-option-${year}`).click();
+  73  |   }
+  74  | 
+  75  |   // Selects the To graduation year.
+  76  |   // @param year the year to select
+  77  |   async selectToYear(year: number) {
+  78  |     await this.toYearSelect.click();
+  79  |     await this.page.getByTestId(`bi-analytics-quick-reports-to-year-option-${year}`).click();
+  80  |   }
+  81  | 
+  82  |   // Clicks "Run all", queuing generation for every visible report with the shared year range.
+  83  |   async clickRunAll() {
+  84  |     await this.runAllButton.click();
+  85  |   }
+  86  | 
+  87  |   // Toggles "Collapse all" / "Expand all".
+  88  |   async clickCollapseAllToggle() {
+  89  |     await this.collapseAllToggle.click();
+  90  |   }
+  91  | 
+  92  |   // Clicks a group's chevron, toggling that group open/closed.
+  93  |   // @param groupKey the group's category key
+  94  |   async clickGroupChevron(groupKey: string) {
+  95  |     await this.page.getByTestId(`bi-analytics-quick-reports-group-chevron-${groupKey}`).click();
+  96  |   }
+  97  | 
+  98  |   // Clicks the Run action for a report row.
+  99  |   // @param reportId the report's id
+  100 |   async clickRun(reportId: number) {
+  101 |     await this.page.getByTestId(`bi-analytics-quick-reports-run-button-${reportId}`).click();
+  102 |   }
+  103 | 
+  104 |   // Clicks the Download action for a report row.
+  105 |   // @param reportId the report's id
+  106 |   async clickDownload(reportId: number) {
+  107 |     await this.page.getByTestId(`bi-analytics-quick-reports-download-button-${reportId}`).click();
+  108 |   }
+  109 | 
+  110 |   // Assertions
+  111 | 
+  112 |   // Asserts the load-error state is shown, with no report table.
+  113 |   async expectLoadErrorState() {
+  114 |     await expect(this.loadErrorCard).toBeVisible();
+  115 |     await expect(this.page.getByText('Something went wrong. Refresh the page to try again.')).toBeVisible();
+  116 |   }
+  117 | 
+  118 |   // Asserts the empty state ("No reports available") is shown for a tenant with zero report types.
+  119 |   async expectNoReportsAvailable() {
+  120 |     await expect(this.noReportsMessage).toBeVisible();
+  121 |   }
+  122 | 
+  123 |   // Asserts the no-search-results state is shown for a term matching nothing.
+  124 |   async expectNoSearchResults() {
+  125 |     await expect(this.noSearchResultsCard).toBeVisible();
+  126 |   }
+  127 | 
+  128 |   // Asserts a report group card is visible with the given count pill value.
+  129 |   // @param groupKey the group's category key
+  130 |   // @param count expected number of reports in the group
+  131 |   async expectGroupCount(groupKey: string, count: number) {
+  132 |     await expect(this.page.getByTestId(`bi-analytics-quick-reports-group-card-${groupKey}`)).toBeVisible();
+  133 |     await expect(this.page.getByTestId(`bi-analytics-quick-reports-group-count-${groupKey}`)).toHaveText(String(count));
+  134 |   }
+  135 | 
+  136 |   // Asserts a report row is visible.
+  137 |   // @param reportId the report's id
+  138 |   async expectReportRowVisible(reportId: number) {
+  139 |     await expect(this.page.getByTestId(`bi-analytics-quick-reports-row-${reportId}`)).toBeVisible();
+  140 |   }
+  141 | 
+  142 |   // Asserts a report row is hidden (its group is collapsed, or it's filtered out by search).
+  143 |   // @param reportId the report's id
+  144 |   async expectReportRowHidden(reportId: number) {
+  145 |     await expect(this.page.getByTestId(`bi-analytics-quick-reports-row-${reportId}`)).toBeHidden();
+  146 |   }
+  147 | 
+  148 |   // Asserts the Run action for a report row shows the in-progress "Generating" state and is disabled.
+  149 |   // @param reportId the report's id
+  150 |   async expectRunGenerating(reportId: number) {
+  151 |     const runButton = this.page.getByTestId(`bi-analytics-quick-reports-run-button-${reportId}`);
+  152 |     await expect(runButton).toBeDisabled();
+  153 |     await expect(runButton).toContainText('Generating');
+  154 |   }
+  155 | 
+  156 |   // Asserts the Run action for a report row is enabled and idle ("Run", no spinner).
+  157 |   // @param reportId the report's id
+  158 |   async expectRunIdle(reportId: number) {
+  159 |     const runButton = this.page.getByTestId(`bi-analytics-quick-reports-run-button-${reportId}`);
+> 160 |     await expect(runButton).toBeEnabled();
+      |                             ^ Error: expect(locator).toBeEnabled() failed
+  161 |     await expect(runButton).toContainText('Run');
+  162 |   }
+  163 | 
+  164 |   // Asserts the Run action for a report row shows the error state after a failed generation.
+  165 |   // @param reportId the report's id
+  166 |   async expectRunErrored(reportId: number) {
+  167 |     await expect(this.page.getByText('There was an error generating the report')).toBeVisible();
+  168 |     await this.expectRunIdle(reportId);
+  169 |   }
+  170 | 
+  171 |   // Asserts "Run all" is disabled — no valid year range set.
+  172 |   async expectRunAllDisabled() {
+  173 |     await expect(this.runAllButton).toBeDisabled();
+  174 |   }
+  175 | 
+  176 |   // Asserts "Run all" is enabled — a valid year range is set.
+  177 |   async expectRunAllEnabled() {
+  178 |     await expect(this.runAllButton).toBeEnabled();
+  179 |   }
+  180 | 
+  181 |   // Asserts the Download action for a report row is disabled (no completed generation).
+  182 |   // @param reportId the report's id
+  183 |   async expectDownloadDisabled(reportId: number) {
+  184 |     await expect(this.page.getByTestId(`bi-analytics-quick-reports-download-button-${reportId}`)).toBeDisabled();
+  185 |   }
+  186 | 
+  187 |   // Asserts the Download action for a report row is enabled (a completed generation exists).
+  188 |   // @param reportId the report's id
+  189 |   async expectDownloadEnabled(reportId: number) {
+  190 |     await expect(this.page.getByTestId(`bi-analytics-quick-reports-download-button-${reportId}`)).toBeEnabled();
+  191 |   }
+  192 | 
+  193 |   // Asserts a report row's freshness badge shows the given text (e.g. "Fresh", "3 weeks old").
+  194 |   // @param reportId the report's id
+  195 |   // @param badgeText the badge's exact displayed text
+  196 |   async expectAgeBadge(reportId: number, badgeText: string) {
+  197 |     await expect(this.page.getByTestId(`bi-analytics-quick-reports-age-badge-${reportId}`)).toHaveText(badgeText);
+  198 |   }
+  199 | 
+  200 |   // Asserts a report row shows "—" (never generated) with no age badge.
+  201 |   // @param reportId the report's id
+  202 |   async expectNeverGenerated(reportId: number) {
+  203 |     await expect(this.page.getByTestId(`bi-analytics-quick-reports-row-${reportId}`)).toContainText('—');
+  204 |     await expect(this.page.getByTestId(`bi-analytics-quick-reports-age-badge-${reportId}`)).toHaveCount(0);
+  205 |   }
+  206 | 
+  207 |   // Asserts direct navigation was denied — no report table renders and the not-authorized
+  208 |   // toast is shown.
+  209 |   async expectUnauthorized() {
+  210 |     await expect(this.unauthorizedToast).toBeVisible();
+  211 |     await expect(this.page.getByTestId(/^bi-analytics-quick-reports-group-card-/)).toHaveCount(0);
+  212 |   }
+  213 | 
+  214 |   // Clicks Download and waits for the resulting file to be saved.
+  215 |   // @param reportId the report's id
+  216 |   async downloadReport(reportId: number) {
+  217 |     const [download] = await Promise.all([this.page.waitForEvent('download'), this.clickDownload(reportId)]);
+  218 |     return download;
+  219 |   }
+  220 | 
+  221 |   // Asserts a downloaded file's name ends in .csv.
+  222 |   // @param download the download event returned by downloadReport
+  223 |   async expectCsvDownload(download: Download) {
+  224 |     expect(download.suggestedFilename()).toMatch(/\.csv$/);
+  225 |   }
+  226 | }
+  227 | 
+```

@@ -1,0 +1,544 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: specs/student-dashboard/direct-apply-section.da.spec.ts >> STUD — Student Dashboard Direct Apply Section >> TC-STUD — Direct Apply section loads with a skeleton then renders country filters that navigate to filtered search
+- Location: tests/specs/student-dashboard/direct-apply-section.da.spec.ts:7:7
+
+# Error details
+
+```
+Error: expect(page).toHaveURL(expected) failed
+
+Expected pattern: /is_direct_apply=true/
+Received string:  "https://qe-automation-da.cialfo.sg/app/13467/home"
+Timeout: 90000ms
+
+Call log:
+  - Expect "toHaveURL" with timeout 90000ms
+    176 × unexpected value "https://qe-automation-da.cialfo.sg/app/13467/home"
+
+```
+
+```yaml
+- complementary:
+  - heading "QE Automation DA" [level=1]
+  - list:
+    - listitem:
+      - link "Home":
+        - /url: /app/13467/home
+        - img
+        - paragraph: Home
+    - listitem:
+      - link "Universities":
+        - /url: /app/students/13467/research_new
+        - img
+        - paragraph: Universities
+    - listitem:
+      - link "Bookmarks":
+        - /url: /app/students/13467/bookmarks
+        - img
+        - paragraph: Bookmarks
+    - listitem:
+      - link "Applications":
+        - /url: /app/students/13467/applications
+        - paragraph: Applications
+    - listitem:
+      - link "Comet":
+        - /url: /app/students/13467/comet
+        - paragraph: Comet
+  - list:
+    - listitem:
+      - status
+  - paragraph
+- banner:
+  - searchbox "Search for universities, content, careers and more.."
+  - navigation:
+    - img
+    - img
+    - img "User Avatar"
+- text: Videos Careers Study guides Articles
+- paragraph: Wednesday, September 23
+- heading "Good morning, QE Student" [level=1]
+- heading "I'm Saige – your personal AI guide" [level=2]
+- paragraph: I'm here to help you unlock the university of your dreams! I tailor every recommendation based on the goals and interests you've shared with Cialfo.
+- button "Best-Fit Universities"
+- button "Application Process"
+- button "Entry Requirements"
+- button "Scholarships"
+- textbox "Ask me anything…"
+- button "Ask Saige"
+- img
+- text: "QE Student e8ac37a06e8145f2ab2d4ed32fc6c3b2 Profile completion: Weak"
+- link "Complete profile":
+  - /url: /app/13467/profile
+  - button "Complete profile"
+- link "Longlist 0":
+  - /url: /app/students/13467/bookmarks
+- link "Shortlist 0":
+  - /url: /app/students/13467/bookmarks
+- link "Applying 0":
+  - /url: /app/students/13467/bookmarks
+- link "Applied 0":
+  - /url: /app/students/13467/applications
+- img
+- button "Ad options"
+- img "Elmhurst University"
+- paragraph: Elmhurst University
+- paragraph: Sponsored · Elmhurst, United States
+- paragraph: Small classes. Global community. Real outcomes.
+- text: 70+ majors 93% alumni employed 13:1 student faculty
+- button "Explore Elmhurst"
+- button "Connect"
+- button
+- button [disabled]
+- heading "Follow us on Instagram" [level=4]
+- paragraph: Follow us on Instagram for admission tricks, application hacks and more.
+- link "Follow us":
+  - /url: https://www.instagram.com/cialfohq/
+  - button "Follow us"
+- button "Dismiss"
+- img
+- heading "Download Cialfo mobile app" [level=4]
+- paragraph: Download the Cialfo mobile app for access to resources and application management with real-time updates.
+- button "I'm not interested"
+- img
+- heading "Use Cialfo Direct Apply to submit applications directly to 600 universities — no separate portal needed" [level=3]
+- img "United Kingdom"
+- heading "United Kingdom" [level=4]
+- button "View 300+ Universities"
+- img "United States"
+- heading "United States" [level=4]
+- button "View 80+ Universities"
+- img "Canada"
+- heading "Canada" [level=4]
+- heading "80+ Universities" [level=4]
+- heading "DA disabled. Please ask your counselor to enable DA for this region" [level=3]
+- img "Australia & New Zealand"
+- heading "Australia & New Zealand" [level=4]
+- button "View 50+ Universities"
+- img "Europe"
+- heading "Europe" [level=4]
+- heading "40+ Universities" [level=4]
+- heading "DA disabled. Please ask your counselor to enable DA for this region" [level=3]
+- text: Discovery Centre Explore videos, career guides, and articles picked for your interests
+- button "Go to Videos":
+  - img
+  - text: Go to Videos
+- button "Go to Careers":
+  - img
+  - text: Go to Careers
+- button "Go to Study guides":
+  - img
+  - text: Go to Study guides
+- button "Go to Articles":
+  - img
+  - text: Go to Articles
+- heading "Personalized recommendations" [level=3]
+- button "Edit"
+- button [disabled]
+- button
+- img "school"
+- img "logo"
+- heading "Nanyang Technological University" [level=1]
+- paragraph: Singapore
+- text: QS Ranking
+- paragraph: "12"
+- text: Portals
+- img "Others"
+- img "Parchment"
+- button "Add to list"
+- button "Connect"
+- img "school"
+- img "logo"
+- heading "Leiden University" [level=1]
+- paragraph: Netherlands
+- text: QS Ranking
+- paragraph: "119"
+- text: Portals
+- img "Others"
+- button "Add to list"
+- button "Connect"
+- img "school"
+- img "logo"
+- heading "EHL Hospitality Business School" [level=1]
+- paragraph: Switzerland
+- text: Portals
+- img "Common Application"
+- img "Others"
+- button "Add to list"
+- button "Connect"
+- img "school"
+- img "logo"
+- heading "University of Amsterdam" [level=1]
+- paragraph: Netherlands
+- text: QS Ranking
+- paragraph: "60"
+- text: Portals
+- img "Others"
+- button "Add to list"
+- button "Connect"
+- img "school"
+- img "logo"
+- heading "Australian National University" [level=1]
+- paragraph: Australia
+- text: QS Ranking
+- paragraph: "29"
+- text: Portals
+- img "Others"
+- button "Add to list"
+- button "Connect"
+- img "school"
+- img "logo"
+- heading "Bocconi University" [level=1]
+- paragraph: Italy
+- text: Portals
+- img "Others"
+- button "Add to list"
+- button "Connect"
+- img "school"
+- img "logo"
+- heading "University of La Verne" [level=1]
+- paragraph: United States
+- text: Portals
+- img "Common Application"
+- img "Others"
+- img "Parchment"
+- button "Add to list"
+- button "Connect"
+- img "school"
+- img "logo"
+- heading "Western University" [level=1]
+- paragraph: Canada
+- text: QS Ranking
+- paragraph: "142"
+- text: Portals
+- img "Others"
+- button "Add to list"
+- button "Connect"
+- heading "Trending videos" [level=1]
+- img "Throwback to University of Liverpool 🎥"
+- heading "Throwback to University of Liverpool 🎥" [level=3]
+- paragraph: "@LivUni"
+- link:
+  - /url: /app/13467/content/details/media734
+  - button:
+    - img
+- img "Explore Queen's University of Charlotte's Campus!"
+- heading "Explore Queen's University of Charlotte's Campus!" [level=3]
+- paragraph: Queen's University of Charlotte
+- link:
+  - /url: /app/13467/content/details/media684
+  - button:
+    - img
+- 'img "How to Make Friends: Tips from a Student at Bangor University"'
+- 'heading "How to Make Friends: Tips from a Student at Bangor University" [level=3]'
+- paragraph: Cialfo
+- link:
+  - /url: /app/13467/content/details/media585
+  - button:
+    - img
+- 'img "College Advice: Miss Frizzle Vibes with a Dash of Reality"'
+- 'heading "College Advice: Miss Frizzle Vibes with a Dash of Reality" [level=3]'
+- paragraph: Cialfo
+- link:
+  - /url: /app/13467/content/details/media524
+  - button:
+    - img
+- img "The Great Discovery Series || Design Psychology at Imperial College London"
+- heading "The Great Discovery Series || Design Psychology at Imperial College London" [level=3]
+- paragraph
+- link:
+  - /url: /app/13467/content/details/media504
+  - button:
+    - img
+- 'img "Cialfo Learning Series | Ep 4: You vs a Robot"'
+- 'heading "Cialfo Learning Series | Ep 4: You vs a Robot" [level=3]'
+- paragraph: Cialfo
+- link:
+  - /url: /app/13467/content/details/media446
+  - button:
+    - img
+- 'img "In Their Shoes: genuine student stories - Derin Kurultak"'
+- 'heading "In Their Shoes: genuine student stories - Derin Kurultak" [level=3]'
+- paragraph: IE University
+- link:
+  - /url: /app/13467/content/details/media394
+  - button:
+    - img
+- img "Hospitality and Tourism Management - On the sofa at the University of Surrey"
+- heading "Hospitality and Tourism Management - On the sofa at the University of Surrey" [level=3]
+- paragraph: University of Surrey
+- link:
+  - /url: /app/13467/content/details/media387
+  - button:
+    - img
+- img "Life at the University of Melbourne"
+- heading "Life at the University of Melbourne" [level=3]
+- paragraph: University of Melbourne
+- link:
+  - /url: /app/13467/content/details/media374
+  - button:
+    - img
+- img "Welcome to the University of Melbourne, Parkville Campus"
+- heading "Welcome to the University of Melbourne, Parkville Campus" [level=3]
+- paragraph: University of Melbourne
+- link:
+  - /url: /app/13467/content/details/media371
+  - button:
+    - img
+- button
+- button [disabled]
+- button "View all"
+- img
+- img
+- heading "@LivUni" [level=3]
+- link "Throwback to University of Liverpool 🎥":
+  - /url: /app/13467/content/details/media734
+  - heading "Throwback to University of Liverpool 🎥" [level=1]
+  - button:
+    - img
+- button
+- heading "Suggested careers for you" [level=3]
+- button "View all"
+- button [disabled]
+- button
+- heading "Sociologists" [level=3]
+- button
+- paragraph: Study human society and social behavior by examining the groups and social institutions that people form, as well as various social, religious, political, and business organizations. May study the behavior and interaction of groups, trace their origin and growth, and analyze the influence of group activities on individual members.
+- paragraph: Great if you prefer something
+- text: Investigative Artistic Social
+- heading "Mechanical Engineering Technologists and Technicians" [level=3]
+- button
+- paragraph: Apply theory and principles of mechanical engineering to modify, develop, test, or adjust machinery and equipment under direction of engineering staff or physical scientists.
+- paragraph: Great if you prefer something
+- text: Realistic Investigative Conventional
+- heading "Photographers" [level=3]
+- button
+- paragraph: Photograph people, landscapes, merchandise, or other subjects. May use lighting equipment to enhance a subject's appearance. May use editing software to produce finished images and prints. Includes commercial and industrial photographers, scientific photographers, and photojournalists.
+- paragraph: Great if you prefer something
+- text: Realistic Artistic Enterprising
+- heading "Technical Writers" [level=3]
+- button
+- paragraph: Write technical materials, such as equipment manuals, appendices, or operating and maintenance instructions. May assist in layout work.
+- paragraph: Great if you prefer something
+- text: Investigative Artistic Conventional
+- heading "Architecture Teachers, Postsecondary" [level=3]
+- button
+- paragraph: Teach courses in architecture and architectural design, such as architectural environmental design, interior architecture/design, and landscape architecture. Includes both teachers primarily engaged in teaching and those who do a combination of teaching and research.
+- paragraph: Great if you prefer something
+- text: Realistic Artistic Social
+- heading "Food Service Managers" [level=3]
+- button
+- paragraph: Plan, direct, or coordinate activities of an organization or department that serves food and beverages.
+- paragraph: Great if you prefer something
+- text: Realistic Enterprising Conventional
+- heading "Special Effects Artists and Animators" [level=3]
+- button
+- paragraph: Create special effects or animations using film, video, computers, or other electronic tools and media for use in products, such as computer games, movies, music videos, and commercials.
+- paragraph: Great if you prefer something
+- text: Realistic Investigative Artistic
+- heading "Physicists" [level=3]
+- button
+- paragraph: Conduct research into physical phenomena, develop theories on the basis of observation and experiments, and devise methods to apply physical laws and theories.
+- paragraph: Great if you prefer something
+- text: Realistic Investigative Artistic
+- heading "Guides to studying abroad" [level=3]
+- button "View all"
+- button [disabled]
+- button
+- img "Study in Bath"
+- paragraph: Location Guide
+- paragraph: Bath
+- img "Study in the UK"
+- paragraph: Country Guide
+- paragraph: United Kingdom
+- img "Study in Netherlands"
+- paragraph: Country Guide
+- paragraph: Netherlands
+- img "Study in Australia"
+- paragraph: Country Guide
+- paragraph: Australia
+- img "Study in the US"
+- paragraph: Country Guide
+- paragraph: United States
+- img "Study in Canada"
+- paragraph: Country Guide
+- paragraph: Canada
+- img "Study in Dublin"
+- paragraph: Location Guide
+- paragraph: Dublin
+- img "Study in Canberra"
+- paragraph: Location Guide
+- paragraph: Canberra
+- heading "Latest articles" [level=3]
+- button "View all"
+- button [disabled]
+- button
+- img "Study in Tokyo in English"
+- paragraph: 3 min read
+- paragraph: Study in Tokyo in English
+- text: Dec 3, 2025·Lara Ray
+- paragraph: Tokyo is big, bright, and full of energy. Neon streets meet quiet shrines, and cutting-edge tech sit ... Read more
+- 'img "Surviving College, One Ramen Packet at a Time: The Ultimate Guide to Eating Well on a Budget"'
+- paragraph: 3 min read
+- paragraph: "Surviving College, One Ramen Packet at a Time: The Ultimate Guide to Eating Well on a Budget"
+- text: Sep 11, 2024·Lara Ray
+- paragraph: Ah, college—where you're juggling classes, social life, and, of course, the perpetual quest for food ... Read more
+- 'img "My Life’s So Basic But That’s Totally Fine: How to Slay Your Personal Statement Without the Drama"'
+- paragraph: 3 min read
+- paragraph: "My Life’s So Basic But That’s Totally Fine: How to Slay Your Personal Statement Without the Drama"
+- text: Sep 11, 2024·Lara Ray
+- paragraph: So, you’re staring at that blinking cursor on your screen, trying to squeeze out a personal statemen ... Read more
+- 'img "The Power of College Interviews: Tips to Ace Your Admissions Interview and Stand Out to Admissions Officers"'
+- paragraph: 4 min read
+- paragraph: "The Power of College Interviews: Tips to Ace Your Admissions Interview and Stand Out to Admissions Officers"
+- text: Jul 17, 2023·Cialfo
+- paragraph: Vericant, a provider of face-to-face interviews, presents students with a straightforward method to ... Read more
+- img "The Importance of Supplemental Essays"
+- paragraph: 8 min read
+- paragraph: The Importance of Supplemental Essays
+- text: Jul 11, 2023·Michelle Duschang
+- paragraph: Are supplemental essays really that important? The short answer is yes. Why do universities ask appl ... Read more
+- 'img "Mindfulness 101: The College Student''s Guide"'
+- paragraph: 3 min read
+- paragraph: "Mindfulness 101: The College Student's Guide"
+- text: Jul 11, 2023
+- paragraph: College life is essentially a whirlwind of lectures, assignments, extracurriculars, and social engag ... Read more
+- 'img "Make the most of your 9th grade summer: Do these things!"'
+- paragraph: 7 min read
+- paragraph: "Make the most of your 9th grade summer: Do these things!"
+- text: Jul 11, 2023·Francis Miller
+- paragraph: You might be all set to enjoy your summer holiday. Or maybe you want to maximize your time and energ ... Read more
+- img "Developing a Growth Mindset"
+- paragraph: 4 min read
+- paragraph: Developing a Growth Mindset
+- text: Jun 13, 2023·Cialfo
+- paragraph: A growth mindset is the belief that abilities and intelligence can be developed and improved through ... Read more
+- button "Close"
+- heading "You can start a chat with me anytime by clicking here!" [level=3]
+```
+
+# Test source
+
+```ts
+  198 |   async expectResultsAsCardGrid() {
+  199 |     await expect(this.resultsCardGrid).toBeVisible();
+  200 |     await expect(this.resultsCardGrid.locator('.p-2').first()).toBeVisible();
+  201 |   }
+  202 | 
+  203 |   // Asserts the table results are narrowed to rows matching the given university name, and no others.
+  204 |   // @param universityName the university name (or partial name) results should be limited to
+  205 |   async expectTableResultsNarrowedTo(universityName: string) {
+  206 |     const rows = this.resultsTable.locator('datatable-body-row');
+  207 |     await expect(rows.first()).toContainText(universityName);
+  208 |     await expect(rows.filter({ hasNotText: universityName })).toHaveCount(0);
+  209 |   }
+  210 | 
+  211 |   // Asserts the card results are narrowed to cards matching the given university name, and no others.
+  212 |   // @param universityName the university name (or partial name) results should be limited to
+  213 |   async expectCardResultsNarrowedTo(universityName: string) {
+  214 |     const cards = this.resultsCardGrid.locator('.p-2');
+  215 |     await expect(cards.first()).toContainText(universityName);
+  216 |     await expect(cards.filter({ hasNotText: universityName })).toHaveCount(0);
+  217 |   }
+  218 | 
+  219 |   // Asserts the search bar has no mode toggle/switch control near it.
+  220 |   async expectNoSearchModeToggle() {
+  221 |     await expect(this.page.getByText(/Regular Search|Super Search/)).toHaveCount(0);
+  222 |   }
+  223 | 
+  224 |   // Asserts the given university (by its cialfo_university_id short_id, not name — a name can
+  225 |   // be a substring of an unrelated university's name) does not appear among the currently
+  226 |   // rendered table rows.
+  227 |   // @param cialfoUniversityId the university's short_id to assert absent
+  228 |   async expectTableResultsExclude(cialfoUniversityId: string) {
+  229 |     await expect(this.resultsTable.locator(`datatable-body-row [data-cialfo-university-id="${cialfoUniversityId}"]`)).toHaveCount(0);
+  230 |   }
+  231 | 
+  232 |   // Asserts the given university (by its cialfo_university_id short_id, not name — a name can
+  233 |   // be a substring of an unrelated university's name) does not appear among the currently
+  234 |   // rendered cards.
+  235 |   // @param cialfoUniversityId the university's short_id to assert absent
+  236 |   async expectCardResultsExclude(cialfoUniversityId: string) {
+  237 |     await expect(this.resultsCardGrid.locator(`[data-cialfo-university-id="${cialfoUniversityId}"]`)).toHaveCount(0);
+  238 |   }
+  239 | 
+  240 |   // Asserts the recommended-mode callout ("Here are N universities hand picked for you") is
+  241 |   // showing, confirming the page is in recommended mode rather than plain browse.
+  242 |   async expectRecommendedModeActive() {
+  243 |     await expect(this.page.getByText(/Here are \d+ universities hand picked for you/)).toBeVisible();
+  244 |   }
+  245 | 
+  246 |   // Returns the given filter chip's current text (label + badge count), for a test that
+  247 |   // needs to assert a selection is unchanged rather than hardcode a catalogue-dependent count.
+  248 |   // @param chip the filter chip to read
+  249 |   async chipText(chip: BrowseFilterChip): Promise<string> {
+  250 |     return (await this.chipLocator(chip).textContent()) ?? '';
+  251 |   }
+  252 | 
+  253 |   // Asserts the given filter chip shows an active-selection badge with the given count.
+  254 |   // @param chip the filter chip to check
+  255 |   // @param count expected active-selection count
+  256 |   async expectChipBadge(chip: BrowseFilterChip, count: number) {
+  257 |     await expect(this.chipLocator(chip)).toContainText(new RegExp(`${chip}\\s*${count}(?!\\d)`));
+  258 |   }
+  259 | 
+  260 |   // Asserts a chip's badge count is at least the given number, for a catalogue-dependent
+  261 |   // count (e.g. selecting a region auto-selects its countries) that can grow over time.
+  262 |   // @param chip the filter chip to check
+  263 |   // @param min minimum expected count
+  264 |   async expectChipBadgeAtLeast(chip: BrowseFilterChip, min: number) {
+  265 |     await expect(async () => {
+  266 |       const match = (await this.chipText(chip)).match(/(\d+)/);
+  267 |       expect(Number(match?.[1])).toBeGreaterThanOrEqual(min);
+  268 |     }).toPass();
+  269 |   }
+  270 | 
+  271 |   // Asserts the given filter chip shows no active-selection badge.
+  272 |   // @param chip the filter chip to check
+  273 |   async expectChipNoBadge(chip: BrowseFilterChip) {
+  274 |     await expect(this.chipLocator(chip)).toHaveText(chip);
+  275 |   }
+  276 | 
+  277 |   // Asserts the More Filters chip shows an active-selection badge (its badge is a single
+  278 |   // active/inactive flag for the whole drawer, not a per-section count).
+  279 |   async expectMoreFiltersActive() {
+  280 |     await expect(this.moreFiltersChip).not.toHaveText('More Filters');
+  281 |   }
+  282 | 
+  283 |   // Asserts the search bar's text matches the given value exactly (used to confirm a described
+  284 |   // search's interpretation never rewrites the box).
+  285 |   // @param value expected search input value
+  286 |   async expectSearchValue(value: string) {
+  287 |     await expect(this.searchInput).toHaveValue(value);
+  288 |   }
+  289 | 
+  290 |   // Asserts a guardian is denied direct navigation to this page.
+  291 |   async expectUnauthorized() {
+  292 |     await expect(this.notAuthorizedToast).toBeVisible();
+  293 |   }
+  294 | 
+  295 |   // Asserts the page landed here with a Direct Apply country filter carried over as a query
+  296 |   // param — the destination the dashboard's Direct Apply section country cards navigate to.
+  297 |   async expectDirectApplyCountryFilterApplied() {
+> 298 |     await expect(this.page).toHaveURL(/is_direct_apply=true/);
+      |                             ^ Error: expect(page).toHaveURL(expected) failed
+  299 |     await expect(this.resultsCardGrid).toBeVisible();
+  300 |   }
+  301 | 
+  302 |   private chipLocator(chip: BrowseFilterChip): Locator {
+  303 |     switch (chip) {
+  304 |       case 'Direct Apply': return this.directApplyChip;
+  305 |       case 'Kickstart Bundle': return this.kickstartBundleChip;
+  306 |       case 'Regions': return this.regionsChip;
+  307 |       case 'Course/Major': return this.courseMajorChip;
+  308 |     }
+  309 |   }
+  310 | }
+  311 | 
+```
